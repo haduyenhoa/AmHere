@@ -9,7 +9,9 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    @IBOutlet weak var swBroadcast: UISwitch!
+    @IBOutlet weak var swReceiver: UISwitch!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -18,6 +20,14 @@ class ViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+
+    @IBAction func enableService(sender: AnyObject) {
+        if (sender as! NSObject == self.swBroadcast) {
+            BLEPeripheralManager.SharedInstance().enableBroadcast(self.swBroadcast.on)
+        } else {
+            BLECentralManager.SharedInstance().enableLE(self.swReceiver.on)
+        }
     }
 
 

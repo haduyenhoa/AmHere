@@ -8,15 +8,21 @@
 
 import Foundation
 import CoreBluetooth
+import UIKit
+
+
+public let SERVICE_TRANSFER_CUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
+
+public let USER_ID_CUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
+public let EXCHANGE_DATA_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440003") //use for delivery a chat message or an image
+
 class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     //private use
     var canBroadcast : Bool = false
     var isBroadcasting : Bool = false
     
     var myBTManager : CBPeripheralManager? = nil
-    
-    let TRANSFER_SERVICE_UUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
-    let CB_CHARACTERISTIC = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
+
     
     class func SharedInstance() -> BLEPeripheralManager {
         struct Static {
@@ -40,19 +46,28 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         println(__FUNCTION__)
         if peripheral.state == CBPeripheralManagerState.PoweredOn {
             println("Broadcasting...")
-            var transferService  = CBMutableService(type: TRANSFER_SERVICE_UUID, primary: true)
+            var transferService  = CBMutableService(type: SERVICE_TRANSFER_CUUID, primary: true)
             
-            var myCharacterristic = CBMutableCharacteristic(type: CB_CHARACTERISTIC, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
-            transferService.characteristics = [myCharacterristic]
-            
-            self.myBTManager?.addService(transferService)
-            self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[TRANSFER_SERVICE_UUID]]
-            )
-            
+            //add characteristic
+            if let _userId = ChatSession.SharedInstance().userId{
+                let userIdChar = CBMutableCharacteristic(type: USER_ID_CUUID, properties: CBCharacteristicProperties.Read
+                    , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
+                let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify
+                    , value: nil, permissions: CBAttributePermissions.Writeable)
+                
+                transferService.characteristics = [userIdChar, exchangeDataChar]
+                
+                self.myBTManager?.addService(transferService)
+                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CUUID]])
+
+            } else {
+                //do nothing
+                println("This session is not start, just do nothing")
+                self.myBTManager?.stopAdvertising() //to be sure, stop advertising
+            }
         } else if peripheral.state == CBPeripheralManagerState.PoweredOff {
             println("Stopped")
-            
-            myBTManager!.stopAdvertising()
+            self.myBTManager?.stopAdvertising()
         } else if peripheral.state == CBPeripheralManagerState.Unsupported {
             println("Unsupported")
         } else if peripheral.state == CBPeripheralManagerState.Unauthorized {
@@ -73,7 +88,15 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         
         if let _request = requests as? [CBATTRequest] where _request.count > 0, let aR = requests[0] as? CBATTRequest {
             let msg = NSString(data: aR.value, encoding: NSUTF8StringEncoding) as! String
+            
             println("Received: \(msg)")
+            
+            var localNotification = UILocalNotification()
+            localNotification.fireDate = NSDate()
+            localNotification.alertBody = "Hey, you must go shopping, remember?"
+            localNotification.alertAction = "View List"
+            
+            UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
         }
     }
     

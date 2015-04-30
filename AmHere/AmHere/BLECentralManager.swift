@@ -1,5 +1,5 @@
 //
-//  BLECentralAgent.swift
+//  BLECentralManager.swift
 //  AmHere
 //
 //  Created by Duyen Hoa Ha on 29/04/2015.
@@ -13,14 +13,23 @@ protocol LEBluetoothManagerDelegate {
     func peripheralsUpdated()
     func servicesUpdated(peripheral : CBPeripheral!)
 }
+//
+//public let TRANSFER_SERVICE_UUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
+//public let CB_CHARACTERISTIC = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
+//public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
 
+/**
+The Receiver
+*/
 class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     var bluetoothManager : CBCentralManager?
     var delegate : LEBluetoothManagerDelegate?
     var currentCBPeripheral : CBPeripheral?
-    let TRANSFER_SERVICE_UUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
-    let CB_CHARACTERISTIC = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
+    var currentChatCBCharacteristic : CBCharacteristic?
+    
+    
+    
     
     class func SharedInstance() -> BLECentralManager {
         struct Static {
@@ -77,7 +86,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
         case CBCentralManagerState.PoweredOn:
             NSLog("State: Powered On. Start scanning peripherals")
-            self.bluetoothManager?.scanForPeripheralsWithServices([TRANSFER_SERVICE_UUID], options: nil)
+            self.bluetoothManager?.scanForPeripheralsWithServices([SERVICE_TRANSFER_CUUID], options: nil)
             break
             
         case CBCentralManagerState.Unknown:
@@ -126,7 +135,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         
         currentCBPeripheral = peripheral
         currentCBPeripheral?.delegate = self
-        currentCBPeripheral?.discoverServices([TRANSFER_SERVICE_UUID])
+        currentCBPeripheral?.discoverServices([SERVICE_TRANSFER_CUUID])
         
         
     }
@@ -143,7 +152,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
         for service in peripheral.services as! [CBService] {
             NSLog("service : \(service.description)")
-            currentCBPeripheral?.discoverCharacteristics([CB_CHARACTERISTIC], forService: service)
+            currentCBPeripheral?.discoverCharacteristics([USER_ID_CUUID], forService: service)
         }
     }
     
@@ -158,15 +167,20 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
         NSLog("service : \(service.description)")
-        NSLog("characters : \(service.characteristics)")
         
-        if let _first = service.characteristics.first as? CBCharacteristic {
-            var parameter = "Hello, My name is Hoa"
-            let dataP = parameter.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)
+        
+        
+        for cb : CBCharacteristic in service.characteristics as! [CBCharacteristic] {
+            NSLog("character : \(cb)")
             
-            currentCBPeripheral?.writeValue(dataP, forCharacteristic: _first, type: CBCharacteristicWriteType.WithResponse)
+            //detect if writable if want to write
             
-            //            currentCBPeripheral?.readValueForCharacteristic(_first)
+            if (cb.UUID == USER_ID_CUUID) {
+                //request read value
+                currentChatCBCharacteristic = cb;
+                currentCBPeripheral?.readValueForCharacteristic(cb)
+                currentCBPeripheral?.setNotifyValue(true, forCharacteristic: cb);
+            }
         }
     }
     
@@ -179,15 +193,10 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        
-        NSLog("descriptors : \(characteristic.properties)")
-        
-        
-        if let descriptors = characteristic.descriptors {
-            NSLog("descriptors : \(descriptors)")
-        }
-        
         NSLog("characteristic value : \(characteristic.value)")
+        if let _data = characteristic.value {
+            print("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
+        }
     }
     
     

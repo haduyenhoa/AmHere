@@ -22,14 +22,14 @@ class LoginViewController : UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        
-    }
-    
-    @IBAction func login(sender : NSObject) {
         if (self.tfUserId.text.isEmpty) {
             //do nothing
         } else {
             ChatSession.SharedInstance().userId = self.tfUserId.text
         }
+    }
+    
+    override func shouldPerformSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> Bool {
+        return !self.tfUserId.text.isEmpty
     }
 }

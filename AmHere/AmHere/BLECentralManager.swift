@@ -9,14 +9,11 @@
 import Foundation
 import CoreBluetooth
 
-protocol LEBluetoothManagerDelegate {
+@objc protocol BLECentralManagerDelegate {
     func peripheralsUpdated()
-    func servicesUpdated(peripheral : CBPeripheral!)
+    
+    optional func servicesUpdated(peripheral : CBPeripheral!)
 }
-//
-//public let TRANSFER_SERVICE_UUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
-//public let CB_CHARACTERISTIC = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
-//public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
 
 /**
 The Receiver
@@ -24,13 +21,15 @@ The Receiver
 class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
     var bluetoothManager : CBCentralManager?
-    var delegate : LEBluetoothManagerDelegate?
-    var currentCBPeripheral : CBPeripheral?
+    var delegate : BLECentralManagerDelegate?
+
     var currentChatCBCharacteristic : CBCharacteristic?
     
+    var nearbyPeripherals  : [CBPeripheral]?
+    var nearbyCBServices : [CBService]?
     
-    
-    
+    var currentCBPeripheral : CBPeripheral? //current friend in chat
+
     class func SharedInstance() -> BLECentralManager {
         struct Static {
             static var instance: BLECentralManager? = nil
@@ -46,9 +45,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func enableLE(shouldEnable : Bool) {
         if (shouldEnable) {
-            var _options = [NSObject : AnyObject]()
-            _options.updateValue("identifier", forKey: CBCentralManagerOptionRestoreIdentifierKey)
-            self.bluetoothManager = CBCentralManager(delegate: self, queue: nil, options:_options)
+//            var _options = [NSObject : AnyObject]()
+//            _options.updateValue("identifier", forKey: CBCentralManagerOptionRestoreIdentifierKey)
+            self.bluetoothManager = CBCentralManager(delegate: self, queue: nil, options:nil)
             
         } else {
             self.bluetoothManager?.stopScan()
@@ -56,14 +55,6 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
             self.bluetoothManager = nil
         }
-    }
-    
-    
-    //MARK: Core Bluetooth
-    func peripheralManagerDidUpdateState(peripheral: CBPeripheralManager!) {
-        NSLog("\(__FUNCTION__)")
-        
-        
     }
     
     //MARK: Central Manager
@@ -101,6 +92,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func centralManager(central: CBCentralManager!, didRetrievePeripherals peripherals: [AnyObject]!) {
         NSLog("\(__FUNCTION__)")
+
         for perif in peripherals as! [CBPeripheral] {
             NSLog("Perif: \(perif.identifier.UUIDString)")
             
@@ -119,13 +111,22 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         
         let data = advertisementData[CBAdvertisementDataManufacturerDataKey] as? NSData
         currentCBPeripheral = peripheral
-        currentCBPeripheral?.delegate = self
+        
         let isConnectable:Bool = advertisementData["kCBAdvDataIsConnectable"] as! Bool
         
         //        currentCBPeripheral?.discoverServices([TRANSFER_SERVICE_UUID])
         
         
         //        currentCBPeripheral?.writeValue(dataP, forCharacteristic: CBCharacteristic(), type: CBCharacteristicWriteType.WithResponse)
+        
+        if (self.nearbyPeripherals == nil) {
+            self.nearbyPeripherals = [CBPeripheral]()
+        }
+        
+        peripheral.delegate = self
+        
+        //add to nearbyPeripherals
+        self.nearbyPeripherals?.append(peripheral)
         
         self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
     }
@@ -136,8 +137,6 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         currentCBPeripheral = peripheral
         currentCBPeripheral?.delegate = self
         currentCBPeripheral?.discoverServices([SERVICE_TRANSFER_CUUID])
-        
-        
     }
     
     func centralManager(central: CBCentralManager!, willRestoreState dict: [NSObject : AnyObject]!) {
@@ -151,6 +150,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
         for service in peripheral.services as! [CBService] {
+            
             NSLog("service : \(service.description)")
             currentCBPeripheral?.discoverCharacteristics([USER_ID_CUUID], forService: service)
         }
@@ -159,22 +159,15 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didDiscoverDescriptorsForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
         NSLog("peripheral : \(peripheral.description)")
         NSLog("characters : \(characteristic)")
-        
-        
-        
-        
     }
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
         NSLog("service : \(service.description)")
         
-        
-        
         for cb : CBCharacteristic in service.characteristics as! [CBCharacteristic] {
             NSLog("character : \(cb)")
             
             //detect if writable if want to write
-            
             if (cb.UUID == USER_ID_CUUID) {
                 //request read value
                 currentChatCBCharacteristic = cb;
@@ -195,11 +188,10 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
         NSLog("characteristic value : \(characteristic.value)")
         if let _data = characteristic.value {
+            //update peripherals cause we can see name
+            self.delegate?.peripheralsUpdated()
+            
             print("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
         }
     }
-    
-    
-    
-    
 }

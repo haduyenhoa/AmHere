@@ -57,6 +57,10 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         }
     }
     
+//    func nearbyFriends() -> [CBPeripheral] {
+//        return _nearbyPeripherals
+//    }
+    
     //MARK: Central Manager
     func centralManagerDidUpdateState(central: CBCentralManager!) {
         //        NSLog("\(__FUNCTION__) New state: \(central.state)")
@@ -77,7 +81,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
         case CBCentralManagerState.PoweredOn:
             NSLog("State: Powered On. Start scanning peripherals")
-            self.bluetoothManager?.scanForPeripheralsWithServices([SERVICE_TRANSFER_CUUID], options: nil)
+            self.bluetoothManager?.scanForPeripheralsWithServices([SERVICE_TRANSFER_CBUUID], options: nil)
             break
             
         case CBCentralManagerState.Unknown:
@@ -119,14 +123,24 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         
         //        currentCBPeripheral?.writeValue(dataP, forCharacteristic: CBCharacteristic(), type: CBCharacteristicWriteType.WithResponse)
         
-        if (self.nearbyPeripherals == nil) {
-            self.nearbyPeripherals = [CBPeripheral]()
+        if (nearbyPeripherals == nil) {
+            nearbyPeripherals = [CBPeripheral]()
         }
         
         peripheral.delegate = self
         
-        //add to nearbyPeripherals
-        self.nearbyPeripherals?.append(peripheral)
+        
+        
+        let exitArrays = self.nearbyPeripherals?.filter() {
+            return ($0 as CBPeripheral).identifier == peripheral.identifier
+        }
+        
+        if exitArrays != nil && exitArrays?.count > 0 {
+            println("This perif is already added \(peripheral.identifier.UUIDString)")
+        } else {
+            //add to nearbyPeripherals
+            nearbyPeripherals?.append(peripheral)
+        }
         
         self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
     }
@@ -136,7 +150,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         
         currentCBPeripheral = peripheral
         currentCBPeripheral?.delegate = self
-        currentCBPeripheral?.discoverServices([SERVICE_TRANSFER_CUUID])
+        currentCBPeripheral?.discoverServices([SERVICE_TRANSFER_CBUUID])
     }
     
     func centralManager(central: CBCentralManager!, willRestoreState dict: [NSObject : AnyObject]!) {
@@ -152,7 +166,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services as! [CBService] {
             
             NSLog("service : \(service.description)")
-            currentCBPeripheral?.discoverCharacteristics([USER_ID_CUUID], forService: service)
+            currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID], forService: service)
         }
     }
     
@@ -168,7 +182,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             NSLog("character : \(cb)")
             
             //detect if writable if want to write
-            if (cb.UUID == USER_ID_CUUID) {
+            if (cb.UUID == USER_ID_CBUUID) {
                 //request read value
                 currentChatCBCharacteristic = cb;
                 currentCBPeripheral?.readValueForCharacteristic(cb)
@@ -191,7 +205,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             //update peripherals cause we can see name
             self.delegate?.peripheralsUpdated()
             
-            print("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
+            println("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
         }
     }
 }

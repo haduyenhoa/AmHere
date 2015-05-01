@@ -11,9 +11,10 @@ import CoreBluetooth
 import UIKit
 
 
-public let SERVICE_TRANSFER_CUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
+public let SERVICE_TRANSFER_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
 
-public let USER_ID_CUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
+public let AVATAR_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
+public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
 public let EXCHANGE_DATA_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440003") //use for delivery a chat message or an image
 
 class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
@@ -46,11 +47,11 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         println(__FUNCTION__)
         if peripheral.state == CBPeripheralManagerState.PoweredOn {
             println("Broadcasting...")
-            var transferService  = CBMutableService(type: SERVICE_TRANSFER_CUUID, primary: true)
+            var transferService  = CBMutableService(type: SERVICE_TRANSFER_CBUUID, primary: true)
             
             //add characteristic
             if let _userId = ChatSession.SharedInstance().userId{
-                let userIdChar = CBMutableCharacteristic(type: USER_ID_CUUID, properties: CBCharacteristicProperties.Read
+                let userIdChar = CBMutableCharacteristic(type: USER_ID_CBUUID, properties: CBCharacteristicProperties.Read
                     , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
                 let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify
                     , value: nil, permissions: CBAttributePermissions.Writeable)
@@ -58,7 +59,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
                 transferService.characteristics = [userIdChar, exchangeDataChar]
                 
                 self.myBTManager?.addService(transferService)
-                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CUUID]])
+                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID]])
 
             } else {
                 //do nothing

@@ -10,6 +10,9 @@ import Foundation
 
 class ChatSession : NSObject {
     var userId : String?
+    var sessionStarted : Bool = false
+    var friendId : String?
+    var isHost : Bool = false
     
     class func SharedInstance() -> ChatSession {
         struct Static {
@@ -24,6 +27,15 @@ class ChatSession : NSObject {
         return Static.instance!
     }
     
+    func beginChat(isHost : Bool, friendUserId : String) {
+        self.friendId = friendUserId
+        sessionStarted = true
+    }
+    
+    func stopChat() {
+        sessionStarted = false
+        isHost = false
+    }
     
     
 }

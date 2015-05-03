@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ED9115E61AF594D9009F75C5 /* ChatRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */; };
 		FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936C1AF285460001DA2F /* ChatSesson.swift */; };
 		FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */; };
 		FD7B93711AF28A2F0001DA2F /* OnlineFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */; };
@@ -31,6 +32,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomViewController.swift; sourceTree = "<group>"; };
 		FD7B936C1AF285460001DA2F /* ChatSesson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatSesson.swift; sourceTree = "<group>"; };
 		FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnlineFriendsViewController.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				FD7B936C1AF285460001DA2F /* ChatSesson.swift */,
 				FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */,
 				FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */,
+				ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */,
 			);
 			path = AmHere;
 			sourceTree = "<group>";
@@ -235,6 +238,7 @@
 				FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */,
 				FDFB6B7F1AF1328E009538B9 /* BLECentralManager.swift in Sources */,
 				FDFB6B611AF13272009538B9 /* ViewController.swift in Sources */,
+				ED9115E61AF594D9009F75C5 /* ChatRoomViewController.swift in Sources */,
 				FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */,
 				FD7B93711AF28A2F0001DA2F /* OnlineFriendsViewController.swift in Sources */,
 				FDFB6B5F1AF13272009538B9 /* AppDelegate.swift in Sources */,

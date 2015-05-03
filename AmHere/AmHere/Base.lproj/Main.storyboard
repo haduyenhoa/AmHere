@@ -77,6 +77,9 @@
                                                 </label>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <segue destination="4st-bf-CDk" kind="show" id="WDt-Y5-CyT"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                                 <connections>
@@ -96,6 +99,25 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1IH-4a-B8Q" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="668" y="186"/>
+        </scene>
+        <!--Chat Room View Controller-->
+        <scene sceneID="EY3-nI-lAp">
+            <objects>
+                <viewController id="4st-bf-CDk" customClass="ChatRoomViewController" customModule="AmHere" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="qaT-QF-slz"/>
+                        <viewControllerLayoutGuide type="bottom" id="X30-dc-9oM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="WAP-1e-mKI">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="g5Q-VF-9QK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1257" y="222"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="4eL-7t-hxs">

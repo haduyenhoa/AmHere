@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1BEACE509443F3AED1302ACC /* libPods-AmHere.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 841EF25CDF60E863EA670142 /* libPods-AmHere.a */; };
+		ED8F77931AF6BB7F00B96E91 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */; };
 		ED9115E61AF594D9009F75C5 /* ChatRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */; };
 		FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936C1AF285460001DA2F /* ChatSesson.swift */; };
 		FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */; };
@@ -32,6 +34,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		05DBBBAF4925B8591A016BDB /* Pods-AmHere.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AmHere.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AmHere/Pods-AmHere.debug.xcconfig"; sourceTree = "<group>"; };
+		841EF25CDF60E863EA670142 /* libPods-AmHere.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-AmHere.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B155C49043A856FCCA1C1AB6 /* Pods-AmHere.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AmHere.release.xcconfig"; path = "Pods/Target Support Files/Pods-AmHere/Pods-AmHere.release.xcconfig"; sourceTree = "<group>"; };
+		ED8F778D1AF6BA3400B96E91 /* AmHere-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AmHere-Bridging-Header.h"; sourceTree = "<group>"; };
+		ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomViewController.swift; sourceTree = "<group>"; };
 		FD7B936C1AF285460001DA2F /* ChatSesson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatSesson.swift; sourceTree = "<group>"; };
 		FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -55,6 +62,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED8F77931AF6BB7F00B96E91 /* QuartzCore.framework in Frameworks */,
+				1BEACE509443F3AED1302ACC /* libPods-AmHere.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,12 +77,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		007390E049E0B20E6B9598C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				841EF25CDF60E863EA670142 /* libPods-AmHere.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B0DB6A2EC7D286759E6E9FDA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				05DBBBAF4925B8591A016BDB /* Pods-AmHere.debug.xcconfig */,
+				B155C49043A856FCCA1C1AB6 /* Pods-AmHere.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 		FDFB6B501AF13272009538B9 = {
 			isa = PBXGroup;
 			children = (
+				ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */,
 				FDFB6B5B1AF13272009538B9 /* AmHere */,
 				FDFB6B711AF13272009538B9 /* AmHereTests */,
 				FDFB6B5A1AF13272009538B9 /* Products */,
+				B0DB6A2EC7D286759E6E9FDA /* Pods */,
+				007390E049E0B20E6B9598C4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -109,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				FDFB6B5D1AF13272009538B9 /* Info.plist */,
+				ED8F778D1AF6BA3400B96E91 /* AmHere-Bridging-Header.h */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -137,9 +167,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FDFB6B781AF13272009538B9 /* Build configuration list for PBXNativeTarget "AmHere" */;
 			buildPhases = (
+				A18F0B14C34985DDD3BF52B2 /* Check Pods Manifest.lock */,
 				FDFB6B551AF13272009538B9 /* Sources */,
 				FDFB6B561AF13272009538B9 /* Frameworks */,
 				FDFB6B571AF13272009538B9 /* Resources */,
+				79C6FE8AEF9857D2578E06E4 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -229,6 +261,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		79C6FE8AEF9857D2578E06E4 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-AmHere/Pods-AmHere-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A18F0B14C34985DDD3BF52B2 /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		FDFB6B551AF13272009538B9 /* Sources */ = {
@@ -369,23 +434,35 @@
 		};
 		FDFB6B791AF13272009538B9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05DBBBAF4925B8591A016BDB /* Pods-AmHere.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = AmHere/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "AmHere/AmHere-Bridging-Header.h";
 			};
 			name = Debug;
 		};
 		FDFB6B7A1AF13272009538B9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B155C49043A856FCCA1C1AB6 /* Pods-AmHere.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = AmHere/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/build/Debug-iphoneos",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "AmHere/AmHere-Bridging-Header.h";
 			};
 			name = Release;
 		};

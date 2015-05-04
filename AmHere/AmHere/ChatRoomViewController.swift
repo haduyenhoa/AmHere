@@ -27,6 +27,10 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
         //TEMP
         NSUserDefaults.saveIncomingAvatarSetting(true)
         NSUserDefaults.saveOutgoingAvatarSetting(true)
+        
+        if (ChatSession.SharedInstance().currentExchangeCharacteristic == nil) {
+            //TODO: ask to wait and updating this Characteristic
+        }
     }
     
     override func viewWillAppear(animated: Bool) {

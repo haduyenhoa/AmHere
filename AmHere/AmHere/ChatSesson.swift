@@ -16,6 +16,7 @@ class ChatSession : NSObject {
     
     var currentPeripheral : CBPeripheral?
     var currentExchangeCharacteristic : CBCharacteristic?
+    var currentAvatarCharacteristic : CBCharacteristic?
     
     class func SharedInstance() -> ChatSession {
         struct Static {
@@ -30,7 +31,7 @@ class ChatSession : NSObject {
         return Static.instance!
     }
     
-    func beginChat(isHost : Bool, friendUserId : String, perif : CBPeripheral, exchangeCharacteristic : CBCharacteristic) {
+    func beginChat(isHost : Bool, friendUserId : String, perif : CBPeripheral, exchangeCharacteristic : CBCharacteristic?) {
         self.friendId = friendUserId
         sessionStarted = true
         
@@ -39,6 +40,8 @@ class ChatSession : NSObject {
         
         NSUserDefaults.saveIncomingAvatarSetting(true)
         NSUserDefaults.saveOutgoingAvatarSetting(true)
+        
+        BLECentralManager.SharedInstance().bluetoothManager?.stopScan()
     }
     
     func stopChat() {

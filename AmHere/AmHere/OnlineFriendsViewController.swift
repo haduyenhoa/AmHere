@@ -10,67 +10,6 @@ import Foundation
 import UIKit
 import CoreBluetooth
 
-extension CBPeripheral {
-    /*
-    Get transfer CBService of a peripheral. This function can return nul if it does not have that service or the service
-    has not been discovered
-    */
-    func getTransferService() -> CBService? {
-        if let _services = self.services {
-            let result = _services.filter() {
-               return ($0 as! CBService).UUID == SERVICE_TRANSFER_CBUUID
-            }
-            return result.first as? CBService
-        }
-        
-        return nil
-    }
-}
-
-extension CBService {
-    /**
-    Get transfer UserId-Characteristic of a service. This function can return nul if it does not have that Characteristic or the Characteristic has not been discovered
-    */
-    func getUserIdCharacteristic() -> CBCharacteristic? {
-        if let _chars = self.characteristics {
-            let result = _chars.filter() {
-                return ($0 as! CBCharacteristic).UUID == USER_ID_CBUUID
-            }
-            return result.first as? CBCharacteristic
-        }
-        
-        return nil
-    }
-    
-    func getAvatarCharacteristic() -> CBCharacteristic? {
-        if let _chars = self.characteristics {
-            let result = _chars.filter() {
-                return ($0 as! CBCharacteristic).UUID == AVATAR_CBUUID
-            }
-            return result.first as? CBCharacteristic
-        }
-        
-        return nil
-    }
-    
-    func getExchangCharacteristic() -> CBCharacteristic? {
-        if let _chars = self.characteristics {
-            let result = _chars.filter() {
-                return ($0 as! CBCharacteristic).UUID == EXCHANGE_DATA_CBUUID
-            }
-            return result.first as? CBCharacteristic
-        }
-        
-        return nil
-    }
-}
-
-extension CBCharacteristic {
-    func isWritable() -> Bool {
-        let result = self.properties & CBCharacteristicProperties.Write
-        return result.rawValue != 0
-    }
-}
 
 class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, BLECentralManagerDelegate {
     @IBOutlet weak var tblFriends : UITableView!
@@ -78,6 +17,15 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationItem.title = "Nearby friends"
+        
+        //Enable Receive
+        BLECentralManager.SharedInstance().delegate = self
+        BLECentralManager.SharedInstance().enableLE(true)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
     }
     
     override func viewDidLoad() {
@@ -85,10 +33,6 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
 
         //Enable broadcast
         BLEPeripheralManager.SharedInstance().enableBroadcast(true)
-        
-        //Enable Receive
-        BLECentralManager.SharedInstance().delegate = self
-        BLECentralManager.SharedInstance().enableLE(true)
     }
     
     //MARK: BLECentralManagerDelegate
@@ -150,23 +94,20 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                         
                         ChatSession.SharedInstance().beginChat(true, friendUserId: userId!, perif: _perif, exchangeCharacteristic: _exC)
                     } else {
-                        println("Cannot find exchange characteristic or userId characteristic")
+                        if let _userIdC = userIdC {
+                            println("Cannot find exchange characteristic or userId characteristic. Will update this later")
+                            var userId = NSString(data: _userIdC.value, encoding: NSUTF8StringEncoding) as? String
+                            
+                            if userId == nil {
+                                userId = ""
+                            }
+                            
+                            ChatSession.SharedInstance().beginChat(true, friendUserId: userId!, perif: _perif, exchangeCharacteristic: exC)
+                        }
                     }
                 } else {
                     println("Cannot find transfer service")
                 }
-               
-                
-                
-             /*
-            , let _exchangeCharacteristic = perif.getTransferService()?.getExchangCharacteristic()
-            , let _transferService = perif.getTransferService()
-            , let _userIdChar = _transferService.getUserIdCharacteristic() {
-*/
-                
-                
-                
-
             }
         }
     }

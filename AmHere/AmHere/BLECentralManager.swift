@@ -10,10 +10,90 @@ import Foundation
 import CoreBluetooth
 
 @objc protocol BLECentralManagerDelegate {
-    func peripheralsUpdated()
+    optional func peripheralsUpdated()
     
     optional func servicesUpdated(peripheral : CBPeripheral!)
 }
+
+
+extension CBPeripheral {
+    /*
+    Get transfer CBService of a peripheral. This function can return nul if it does not have that service or the service
+    has not been discovered
+    */
+    func getTransferService() -> CBService? {
+        if let _services = self.services {
+            let result = _services.filter() {
+                return ($0 as! CBService).UUID == SERVICE_TRANSFER_CBUUID
+            }
+            return result.first as? CBService
+        }
+        
+        return nil
+    }
+    
+    func isAvatarAvailable() -> Bool {
+        return self.getTransferService()?.getAvatarCharacteristic() != nil
+    }
+    
+    func isUserIdUpdated() -> Bool {
+        return self.getTransferService()?.getUserIdCharacteristic()?.value != nil
+    }
+    
+    func isExchangeCharacteristicReady() -> Bool {
+        if let _char = self.getTransferService()?.getExchangCharacteristic() {
+            return _char.isWritable()
+        } else {
+            return false
+        }
+    }
+}
+
+extension CBService {
+    /**
+    Get transfer UserId-Characteristic of a service. This function can return nul if it does not have that Characteristic or the Characteristic has not been discovered
+    */
+    func getUserIdCharacteristic() -> CBCharacteristic? {
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == USER_ID_CBUUID
+            }
+            return result.first as? CBCharacteristic
+        }
+        
+        return nil
+    }
+    
+    func getAvatarCharacteristic() -> CBCharacteristic? {
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == AVATAR_CBUUID
+            }
+            return result.first as? CBCharacteristic
+        }
+        
+        return nil
+    }
+    
+    func getExchangCharacteristic() -> CBCharacteristic? {
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == EXCHANGE_DATA_CBUUID
+            }
+            return result.first as? CBCharacteristic
+        }
+        
+        return nil
+    }
+}
+
+extension CBCharacteristic {
+    func isWritable() -> Bool {
+        let result = self.properties & CBCharacteristicProperties.Write
+        return result.rawValue != 0
+    }
+}
+
 
 /**
 The Receiver
@@ -170,7 +250,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services {
             if let _service = service as? CBService {
                 NSLog("service : \(_service.description)")
-                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID], forService: _service)
+                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID], forService: _service)
                 //TODO: move EXChange service to ChatRoom
             }
         }
@@ -204,6 +284,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
 //                self.nearbyExchangeCBCharacteristic = uniq(self.nearbyExchangeCBCharacteristic)
                 
                 peripheral.setNotifyValue(true, forCharacteristic: cb)
+            } else if (cb.UUID == AVATAR_CBUUID) {
+                //updated avatar
+                println("avatar updated")
             }
         }
     }
@@ -220,13 +303,30 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
 //        NSLog("characteristic value : \(characteristic.value)")
         if let _data = characteristic.value {
             //update peripherals cause we can see name
-            self.delegate?.peripheralsUpdated()
+            self.delegate?.peripheralsUpdated!()
             
 //            println("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
         }
     }
     
     //MARK Helpers
+    func updateAvatar(perif : CBPeripheral) {
+        if let _cbService = perif.getTransferService() {
+            perif.discoverCharacteristics([AVATAR_CBUUID], forService: _cbService)
+        } else {
+            println("this perif does not have transfer service to get avatar characteristicf")
+        }
+        
+    }
+    
+    func updateExchangeService(perif : CBPeripheral) {
+        if let _cbService = perif.getTransferService() {
+            perif.discoverCharacteristics([EXCHANGE_DATA_CBUUID], forService: _cbService)
+        } else {
+            println("this perif does not have transfer service to start exchange characteristic")
+        }
+    }
+    
     func uniq<S : SequenceType, T : Hashable where S.Generator.Element == T>(source: S) -> [T] {
         var buffer = [T]()
         var added = Set<T>()

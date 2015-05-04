@@ -44,7 +44,8 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return BLECentralManager.SharedInstance().nearbyPeripherals?.count ?? 0
+        var allKeys = BLECentralManager.SharedInstance().dicPeripheral.keys.array
+        return allKeys.count
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -55,21 +56,17 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
         let cell = tableView.dequeueReusableCellWithIdentifier("FriendViewCell") as! UITableViewCell
         
         //update label
-        if let _perifs = BLECentralManager.SharedInstance().nearbyPeripherals {
-            let rowPerif = _perifs[indexPath.row]
-            
-            if let _transferService = rowPerif.getTransferService() {
-                if let _userIdChar = _transferService.getUserIdCharacteristic() {
-                    (cell.viewWithTag(2) as! UILabel).text = NSString(data: _userIdChar.value, encoding: NSUTF8StringEncoding) as? String
-                } else {
-                    //display "fetching user id"
-                    (cell.viewWithTag(2) as! UILabel).text = "Fetching User Id ..."
-                }
+        var perif  = BLECentralManager.SharedInstance().dicPeripheral.values.array[indexPath.row].0
+        
+        if let _transferService = perif.getTransferService() {
+            if let _userIdChar = _transferService.getUserIdCharacteristic() {
+                (cell.viewWithTag(2) as! UILabel).text = NSString(data: _userIdChar.value, encoding: NSUTF8StringEncoding) as? String
             } else {
-                (cell.viewWithTag(2) as! UILabel).text = "Fetching CB Service ..."
+                //display "fetching user id"
+                (cell.viewWithTag(2) as! UILabel).text = "Fetching User Id ..."
             }
         } else {
-            (cell.viewWithTag(2) as! UILabel).text = "[Peripheral disconnected]"
+            (cell.viewWithTag(2) as! UILabel).text = "Fetching CB Service ..."
         }
         
         return cell
@@ -78,8 +75,9 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier?.compare("startChatRoom", options: .allZeros, range: nil, locale: nil) == .OrderedSame) {
             if let _indexPath = self.tblFriends.indexPathForSelectedRow()
-                , let _perif = BLECentralManager.SharedInstance().nearbyPeripherals?[_indexPath.row]
             {
+                let _perif = BLECentralManager.SharedInstance().dicPeripheral.values.array[_indexPath.row].0
+                
                 if let _transferService = _perif.getTransferService() {
                     var exC = _transferService.getExchangCharacteristic()
                     

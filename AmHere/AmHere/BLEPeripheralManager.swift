@@ -29,6 +29,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     var myBTManager : CBPeripheralManager? = nil
     var delegate : PeripheralDelegate?
     
+    
     class func SharedInstance() -> BLEPeripheralManager {
         struct Static {
             static var instance: BLEPeripheralManager? = nil
@@ -63,7 +64,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
                 transferService.characteristics = [userIdChar, exchangeDataChar]
                 
                 self.myBTManager?.addService(transferService)
-                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID]])
+                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID], CBAdvertisementDataLocalNameKey : (UIApplication.sharedApplication().delegate as! AppDelegate).UUIDString])
 
             } else {
                 //do nothing
@@ -89,7 +90,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     }
     
     func peripheralManager(peripheral: CBPeripheralManager!, didReceiveWriteRequests requests: [AnyObject]!) {
-        println("didReceiveWriteRequests: \(requests)")
+        println("didReceiveWriteRequests")
         
         //TODO: process multi request (from multi user). Create multi chat-room
         if let _request = requests as? [CBATTRequest] where _request.count > 0, let aR = requests[0] as? CBATTRequest {

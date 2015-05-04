@@ -11,6 +11,8 @@ import UIKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    let UUIDString = NSUUID().UUIDString
+    
     var window: UIWindow?
     let bleCentral = BLECentralManager.SharedInstance()
     let blePeripheral = BLEPeripheralManager.SharedInstance()

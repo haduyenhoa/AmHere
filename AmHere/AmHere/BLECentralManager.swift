@@ -106,7 +106,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
 //    var currentChatCBCharacteristic : CBCharacteristic?
 //    var currentExchangeDataCBCharacteristic : CBCharacteristic?
     
-    var nearbyPeripherals  : [CBPeripheral]?
+    var dicPeripheral = [String : (CBPeripheral, [NSObject : AnyObject])]()
+    
+//    var nearbyPeripherals  : [CBPeripheral]?
     var nearbyExchangeCBCharacteristic : [CBCharacteristic]?
     
 //    
@@ -182,15 +184,16 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func centralManager(central: CBCentralManager!, didRetrievePeripherals peripherals: [AnyObject]!) {
-        NSLog("\(__FUNCTION__)")
-
-        for perif in peripherals as! [CBPeripheral] {
-            NSLog("Perif: \(perif.identifier.UUIDString)")
-            
-            for service in perif.services as! [CBService] {
-                NSLog("service : \(service.description)")
-            }
-        }
+        println("\(__FUNCTION__)")
+        println("didRetrievePeripherals")
+//
+//        for perif in peripherals as! [CBPeripheral] {
+//            println("Perif: \(perif.identifier.UUIDString)")
+//            
+//            for service in perif.services as! [CBService] {
+//                println("service : \(service.description)")
+//            }
+//        }
     }
     
     func centralManager(central: CBCentralManager!, didDiscoverPeripheral peripheral: CBPeripheral!, advertisementData: [NSObject : AnyObject]!, RSSI: NSNumber!) {
@@ -201,49 +204,61 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         NSLog("Discovered: \(peripheral)")
         
         let data = advertisementData[CBAdvertisementDataManufacturerDataKey] as? NSData
-        let isConnectable:Bool = advertisementData["kCBAdvDataIsConnectable"] as! Bool
-        
+        let isConnectable:Bool = advertisementData[CBAdvertisementDataIsConnectable] as! Bool
+        let vendorId = advertisementData[CBAdvertisementDataLocalNameKey] as? String
         //        currentCBPeripheral?.discoverServices([TRANSFER_SERVICE_UUID])
         
+//        assert(vendorId != nil, "Vendor ID cannot be nil")
         
         //        currentCBPeripheral?.writeValue(dataP, forCharacteristic: CBCharacteristic(), type: CBCharacteristicWriteType.WithResponse)
         
-        if (nearbyPeripherals == nil) {
-            nearbyPeripherals = [CBPeripheral]()
+//        if (nearbyPeripherals == nil) {
+//            nearbyPeripherals = [CBPeripheral]()
+//        }
+        
+        let exitArrays = dicPeripheral.values.array.filter() {
+            return ($0.0 as CBPeripheral).identifier == peripheral.identifier
         }
         
-        peripheral.delegate = self
-        
-        
-        
-        let exitArrays = self.nearbyPeripherals?.filter() {
-            return ($0 as CBPeripheral).identifier == peripheral.identifier
-        }
-        
-        if exitArrays != nil && exitArrays?.count > 0 {
+        if exitArrays.count > 0 {
             println("This perif is already added \(peripheral.identifier.UUIDString)")
         } else {
-            //add to nearbyPeripherals
-            nearbyPeripherals?.append(peripheral)
+            if let _vendor = vendorId {
+                peripheral.delegate = self
+                
+                println("Add/update for vendor : \(_vendor)")
+                dicPeripheral.updateValue((peripheral, advertisementData), forKey: _vendor)
+                
+                //discovery service
+                self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
+            }
         }
         
-        self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
+        
+        
+        
+        
+        /*
+        
+        */
+        
+        
     }
     
     func centralManager(central: CBCentralManager!, didConnectPeripheral peripheral: CBPeripheral!) {
-        NSLog("Perif: \(peripheral.identifier.UUIDString)")
+        println("Perif: \(peripheral.identifier.UUIDString)")
 
         peripheral.delegate = self
         peripheral.discoverServices([SERVICE_TRANSFER_CBUUID])
     }
     
     func centralManager(central: CBCentralManager!, willRestoreState dict: [NSObject : AnyObject]!) {
-        NSLog("%@", dict)
+        println("%@", dict)
     }
     
     //MARK: Peripheral
     func peripheral(peripheral: CBPeripheral!, didDiscoverIncludedServicesForService service: CBService!, error: NSError!) {
-        NSLog("service : \(service.description)")
+        println("service : \(service.description)")
     }
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
@@ -257,12 +272,15 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverDescriptorsForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        NSLog("peripheral : \(peripheral.description)")
-        NSLog("characters : \(characteristic)")
+        println("\(__FUNCTION__)")
+        
+//        NSLog("peripheral : \(peripheral.description)")
+//        NSLog("characters : \(characteristic)")
     }
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverCharacteristicsForService service: CBService!, error: NSError!) {
-        NSLog("service : \(service.description)")
+        println("\(__FUNCTION__)")
+//        NSLog("service : \(service.description)")
         
         for cb : CBCharacteristic in service.characteristics as! [CBCharacteristic] {
             NSLog("character : \(cb)")
@@ -292,7 +310,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didWriteValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        NSLog("didWriteValueForCharacteristic : \(characteristic)")
+        NSLog("didWriteValueForCharacteristic : \(characteristic.UUID.UUIDString)")
         
         if (error != nil) {
             NSLog("Error writing characteristic value: \(error.localizedDescription)")

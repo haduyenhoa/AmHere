@@ -95,7 +95,10 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             let msg = NSString(data: aR.value, encoding: NSUTF8StringEncoding) as! String
             
             println("Received: \(msg)")
-
+            
+            //responds to sender
+            self.myBTManager?.respondToRequest(aR, withResult: CBATTError.Success)
+            
             self.delegate?.receiveMessage?(msg) //call delegate if possible
             
 //            var localNotification = UILocalNotification()

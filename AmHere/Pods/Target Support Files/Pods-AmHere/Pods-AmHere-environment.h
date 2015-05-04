@@ -18,3 +18,9 @@
 #define COCOAPODS_VERSION_MINOR_JSQSystemSoundPlayer 0
 #define COCOAPODS_VERSION_PATCH_JSQSystemSoundPlayer 1
 
+// ProtocolBuffers
+#define COCOAPODS_POD_AVAILABLE_ProtocolBuffers
+#define COCOAPODS_VERSION_MAJOR_ProtocolBuffers 1
+#define COCOAPODS_VERSION_MINOR_ProtocolBuffers 9
+#define COCOAPODS_VERSION_PATCH_ProtocolBuffers 2
+

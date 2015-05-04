@@ -2,12 +2,15 @@ PODS:
   - JSQMessagesViewController (7.0.1):
     - JSQSystemSoundPlayer (~> 2.0.1)
   - JSQSystemSoundPlayer (2.0.1)
+  - ProtocolBuffers (1.9.2)
 
 DEPENDENCIES:
   - JSQMessagesViewController
+  - ProtocolBuffers (= 1.9.2)
 
 SPEC CHECKSUMS:
   JSQMessagesViewController: 03fba8a3021a3ddc1c91847f180ffe549f2e8cf2
   JSQSystemSoundPlayer: c5850e77a4363ffd374cd851154b9af93264ed8d
+  ProtocolBuffers: f3ea199412832b2ff70bbbb4288e0f70cf4ba757
 
-COCOAPODS: 0.37.0
+COCOAPODS: 0.35.0

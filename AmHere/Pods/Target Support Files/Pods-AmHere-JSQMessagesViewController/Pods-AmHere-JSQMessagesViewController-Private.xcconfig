@@ -1,6 +1,5 @@
 #include "Pods-AmHere-JSQMessagesViewController.xcconfig"
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
-HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Private" "${PODS_ROOT}/Headers/Private/JSQMessagesViewController" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/JSQMessagesViewController" "${PODS_ROOT}/Headers/Public/JSQSystemSoundPlayer"
+HEADER_SEARCH_PATHS = "${PODS_ROOT}/Headers/Build" "${PODS_ROOT}/Headers/Build/JSQMessagesViewController" "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/JSQMessagesViewController" "${PODS_ROOT}/Headers/Public/JSQSystemSoundPlayer" "${PODS_ROOT}/Headers/Public/ProtocolBuffers" "${PODS_ROOT}/Headers/Public/ProtocolBuffers/ProtocolBuffers"
 OTHER_LDFLAGS = ${PODS_AMHERE_JSQMESSAGESVIEWCONTROLLER_OTHER_LDFLAGS} -ObjC
 PODS_ROOT = ${SRCROOT}
-SKIP_INSTALL = YES

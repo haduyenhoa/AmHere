@@ -17,13 +17,17 @@ public let AVATAR_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001"
 public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
 public let EXCHANGE_DATA_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440003") //use for delivery a chat message or an image
 
+@objc protocol PeripheralDelegate {
+    optional func receiveMessage(msg: String!)
+}
+
 class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     //private use
     var canBroadcast : Bool = false
     var isBroadcasting : Bool = false
     
     var myBTManager : CBPeripheralManager? = nil
-
+    var delegate : PeripheralDelegate?
     
     class func SharedInstance() -> BLEPeripheralManager {
         struct Static {
@@ -91,13 +95,15 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             let msg = NSString(data: aR.value, encoding: NSUTF8StringEncoding) as! String
             
             println("Received: \(msg)")
+
+            self.delegate?.receiveMessage?(msg) //call delegate if possible
             
-            var localNotification = UILocalNotification()
-            localNotification.fireDate = NSDate()
-            localNotification.alertBody = "Hey, you must go shopping, remember?"
-            localNotification.alertAction = "View List"
-            
-            UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
+//            var localNotification = UILocalNotification()
+//            localNotification.fireDate = NSDate()
+//            localNotification.alertBody = "Hey, you must go shopping, remember?"
+//            localNotification.alertAction = "View List"
+//            
+//            UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
         }
     }
     

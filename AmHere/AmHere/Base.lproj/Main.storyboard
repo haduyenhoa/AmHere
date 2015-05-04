@@ -78,7 +78,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="4st-bf-CDk" kind="show" id="WDt-Y5-CyT"/>
+                                            <segue destination="4st-bf-CDk" kind="show" identifier="startChatRoom" id="WDt-Y5-CyT"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

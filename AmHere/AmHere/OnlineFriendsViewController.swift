@@ -124,4 +124,10 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
         
         return cell
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if (segue.identifier?.compare("startChatRoom", options: .allZeros, range: nil, locale: nil) == .OrderedSame) {
+            
+        }
+    }
 }

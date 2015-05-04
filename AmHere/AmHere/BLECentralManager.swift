@@ -24,6 +24,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     var delegate : BLECentralManagerDelegate?
 
     var currentChatCBCharacteristic : CBCharacteristic?
+    var currentExchangeDataCBCharacteristic : CBCharacteristic?
     
     var nearbyPeripherals  : [CBPeripheral]?
     var nearbyCBServices : [CBService]?
@@ -166,7 +167,8 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services {
             if let _service = service as? CBService {
                 NSLog("service : \(_service.description)")
-                currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID], forService: _service)
+                currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID], forService: _service)
+                //TODO: move EXChange service to ChatRoom
             }
         }
     }
@@ -188,6 +190,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
                 currentChatCBCharacteristic = cb;
                 currentCBPeripheral?.readValueForCharacteristic(cb)
                 currentCBPeripheral?.setNotifyValue(true, forCharacteristic: cb);
+            } else if (cb.UUID == EXCHANGE_DATA_CBUUID) {
+                currentExchangeDataCBCharacteristic = cb;
+                currentCBPeripheral?.setNotifyValue(true, forCharacteristic: cb)
             }
         }
     }

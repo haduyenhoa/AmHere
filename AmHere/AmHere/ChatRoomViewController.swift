@@ -8,8 +8,9 @@
 
 import Foundation
 import UIKit
+import CoreBluetooth
 
-class ChatRoomViewController: JSQMessagesViewController {
+class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
     var demoData : DemoModelData?
     
     override func viewDidLoad() {
@@ -25,6 +26,7 @@ class ChatRoomViewController: JSQMessagesViewController {
         self.senderId = ChatSession.SharedInstance().userId
         self.senderDisplayName = "Name: " + ChatSession.SharedInstance().userId!
         
+        BLEPeripheralManager.SharedInstance().delegate = self
         
         super.viewWillAppear(animated)
     }
@@ -34,6 +36,13 @@ class ChatRoomViewController: JSQMessagesViewController {
         let msg = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
         
         self.demoData?.messages.addObject(msg)
+        
+        //send to Peripheral
+        if let _cb = BLECentralManager.SharedInstance().currentExchangeDataCBCharacteristic
+        , let _peripheral = BLECentralManager.SharedInstance().currentCBPeripheral
+        {
+            _peripheral.writeValue(text.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), forCharacteristic: _cb, type: CBCharacteristicWriteType.WithResponse)
+        }
         
         self.finishSendingMessageAnimated(true)
     }
@@ -94,5 +103,18 @@ class ChatRoomViewController: JSQMessagesViewController {
     
     override func didPressAccessoryButton(sender: UIButton!) {
         //do nothing for now
+    }
+    
+    
+    //MARK: BLEPeripheralManager Delegate
+    func receiveMessage(msg: String!) {
+        let msg = JSQMessage(senderId: "Other", displayName: senderDisplayName, text: msg)
+        
+        self.demoData?.messages.addObject(msg)
+        dispatch_async(dispatch_get_main_queue(), {
+            self.finishSendingMessageAnimated(true)
+            }
+        )
+        
     }
 }

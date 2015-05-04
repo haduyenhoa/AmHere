@@ -30,6 +30,9 @@ class ChatSession : NSObject {
     func beginChat(isHost : Bool, friendUserId : String) {
         self.friendId = friendUserId
         sessionStarted = true
+        
+        NSUserDefaults.saveIncomingAvatarSetting(true)
+        NSUserDefaults.saveOutgoingAvatarSetting(true)
     }
     
     func stopChat() {

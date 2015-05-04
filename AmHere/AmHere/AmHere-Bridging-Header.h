@@ -15,3 +15,4 @@
 #import <JSQMessagesViewController/JSQMessages.h>
 #import "DemoModelData.h"
 #import "NSUserDefaults+DemoSettings.h"
+#import "UICollectionViewController+TimeStamp.h"

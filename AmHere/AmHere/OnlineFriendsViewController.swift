@@ -127,7 +127,19 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier?.compare("startChatRoom", options: .allZeros, range: nil, locale: nil) == .OrderedSame) {
-            
+            if let _indexPath = self.tblFriends.indexPathForSelectedRow()
+                , let perif = BLECentralManager.SharedInstance().nearbyPeripherals?[_indexPath.row] {
+                    
+                    if let _transferService = perif.getTransferService() {
+                        if let _userIdChar = _transferService.getUserIdCharacteristic() {
+                           ChatSession.SharedInstance().friendId = NSString(data: _userIdChar.value, encoding: NSUTF8StringEncoding) as? String
+                            
+                            
+                        } else {
+                            
+                        }
+                    }
+            }
         }
     }
 }

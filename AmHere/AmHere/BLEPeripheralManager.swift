@@ -91,6 +91,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     func peripheralManager(peripheral: CBPeripheralManager!, didReceiveWriteRequests requests: [AnyObject]!) {
         println("didReceiveWriteRequests: \(requests)")
         
+        //TODO: process multi request (from multi user). Create multi chat-room
         if let _request = requests as? [CBATTRequest] where _request.count > 0, let aR = requests[0] as? CBATTRequest {
             let msg = NSString(data: aR.value, encoding: NSUTF8StringEncoding) as! String
             

@@ -43,19 +43,25 @@ extension CBService {
     }
     
     func getAvatarCharacteristic() -> CBCharacteristic? {
-        let characteristics = self.characteristics.filter() {
-            return  $0.UUIDString != nil && $0.UUIDString.compare(AVATAR_CBUUID.UUIDString, options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil, locale: nil) == NSComparisonResult.OrderedSame
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == AVATAR_CBUUID
+            }
+            return result.first as? CBCharacteristic
         }
         
-        return characteristics.first as? CBCharacteristic
+        return nil
     }
     
     func getExchangCharacteristic() -> CBCharacteristic? {
-        let characteristics = self.characteristics.filter() {
-            return  $0.UUIDString != nil && $0.UUIDString == EXCHANGE_DATA_CBUUID.UUIDString.uppercaseString
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == EXCHANGE_DATA_CBUUID
+            }
+            return result.first as? CBCharacteristic
         }
         
-        return characteristics.first as? CBCharacteristic
+        return nil
     }
 }
 

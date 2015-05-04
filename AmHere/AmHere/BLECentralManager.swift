@@ -27,6 +27,8 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
 //    var currentExchangeDataCBCharacteristic : CBCharacteristic?
     
     var nearbyPeripherals  : [CBPeripheral]?
+    var nearbyExchangeCBCharacteristic : [CBCharacteristic]?
+    
 //    
 //    var currentCBPeripheral : CBPeripheral? //current friend in chat
 
@@ -193,6 +195,14 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
                 peripheral.setNotifyValue(true, forCharacteristic: cb);
             } else if (cb.UUID == EXCHANGE_DATA_CBUUID) {
 //                currentExchangeDataCBCharacteristic = cb;
+                if (self.nearbyExchangeCBCharacteristic == nil) {
+                    self.nearbyExchangeCBCharacteristic = [CBCharacteristic]()
+                }
+                
+//                self.nearbyExchangeCBCharacteristic?.removeAtIndex(find(self.nearbyExchangeCBCharacteristic, cb))
+                self.nearbyExchangeCBCharacteristic?.append(cb)
+//                self.nearbyExchangeCBCharacteristic = uniq(self.nearbyExchangeCBCharacteristic)
+                
                 peripheral.setNotifyValue(true, forCharacteristic: cb)
             }
         }
@@ -207,12 +217,25 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        NSLog("characteristic value : \(characteristic.value)")
+//        NSLog("characteristic value : \(characteristic.value)")
         if let _data = characteristic.value {
             //update peripherals cause we can see name
             self.delegate?.peripheralsUpdated()
             
-            println("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
+//            println("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
         }
+    }
+    
+    //MARK Helpers
+    func uniq<S : SequenceType, T : Hashable where S.Generator.Element == T>(source: S) -> [T] {
+        var buffer = [T]()
+        var added = Set<T>()
+        for elem in source {
+            if !added.contains(elem) {
+                buffer.append(elem)
+                added.insert(elem)
+            }
+        }
+        return buffer
     }
 }

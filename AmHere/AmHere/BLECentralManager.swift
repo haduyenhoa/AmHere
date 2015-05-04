@@ -163,10 +163,11 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
-        for service in peripheral.services as! [CBService] {
-            
-            NSLog("service : \(service.description)")
-            currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID], forService: service)
+        for service in peripheral.services {
+            if let _service = service as? CBService {
+                NSLog("service : \(_service.description)")
+                currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID], forService: _service)
+            }
         }
     }
     

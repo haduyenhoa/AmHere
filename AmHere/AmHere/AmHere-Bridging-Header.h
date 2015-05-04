@@ -13,3 +13,5 @@
 #endif
 
 #import <JSQMessagesViewController/JSQMessages.h>
+#import "DemoModelData.h"
+#import "NSUserDefaults+DemoSettings.h"

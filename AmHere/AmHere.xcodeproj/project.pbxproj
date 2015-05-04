@@ -10,6 +10,8 @@
 		1BEACE509443F3AED1302ACC /* libPods-AmHere.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 841EF25CDF60E863EA670142 /* libPods-AmHere.a */; };
 		ED8F77931AF6BB7F00B96E91 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */; };
 		ED9115E61AF594D9009F75C5 /* ChatRoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */; };
+		FD57AA5E1AF761CD00DB8CF7 /* DemoModelData.m in Sources */ = {isa = PBXBuildFile; fileRef = FD57AA5D1AF761CD00DB8CF7 /* DemoModelData.m */; };
+		FD57AA611AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = FD57AA601AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.m */; };
 		FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936C1AF285460001DA2F /* ChatSesson.swift */; };
 		FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */; };
 		FD7B93711AF28A2F0001DA2F /* OnlineFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */; };
@@ -40,6 +42,10 @@
 		ED8F778D1AF6BA3400B96E91 /* AmHere-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AmHere-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		ED9115E51AF594D9009F75C5 /* ChatRoomViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatRoomViewController.swift; sourceTree = "<group>"; };
+		FD57AA5C1AF761CD00DB8CF7 /* DemoModelData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DemoModelData.h; sourceTree = "<group>"; };
+		FD57AA5D1AF761CD00DB8CF7 /* DemoModelData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DemoModelData.m; sourceTree = "<group>"; };
+		FD57AA5F1AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+DemoSettings.h"; sourceTree = "<group>"; };
+		FD57AA601AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+DemoSettings.m"; sourceTree = "<group>"; };
 		FD7B936C1AF285460001DA2F /* ChatSesson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatSesson.swift; sourceTree = "<group>"; };
 		FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnlineFriendsViewController.swift; sourceTree = "<group>"; };
@@ -118,6 +124,10 @@
 		FDFB6B5B1AF13272009538B9 /* AmHere */ = {
 			isa = PBXGroup;
 			children = (
+				FD57AA5F1AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.h */,
+				FD57AA601AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.m */,
+				FD57AA5C1AF761CD00DB8CF7 /* DemoModelData.h */,
+				FD57AA5D1AF761CD00DB8CF7 /* DemoModelData.m */,
 				FDFB6B5E1AF13272009538B9 /* AppDelegate.swift */,
 				FDFB6B601AF13272009538B9 /* ViewController.swift */,
 				FDFB6B621AF13272009538B9 /* Main.storyboard */,
@@ -301,9 +311,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */,
+				FD57AA5E1AF761CD00DB8CF7 /* DemoModelData.m in Sources */,
 				FDFB6B7F1AF1328E009538B9 /* BLECentralManager.swift in Sources */,
 				FDFB6B611AF13272009538B9 /* ViewController.swift in Sources */,
 				ED9115E61AF594D9009F75C5 /* ChatRoomViewController.swift in Sources */,
+				FD57AA611AF761E100DB8CF7 /* NSUserDefaults+DemoSettings.m in Sources */,
 				FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */,
 				FD7B93711AF28A2F0001DA2F /* OnlineFriendsViewController.swift in Sources */,
 				FDFB6B5F1AF13272009538B9 /* AppDelegate.swift in Sources */,

@@ -23,13 +23,12 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     var bluetoothManager : CBCentralManager?
     var delegate : BLECentralManagerDelegate?
 
-    var currentChatCBCharacteristic : CBCharacteristic?
-    var currentExchangeDataCBCharacteristic : CBCharacteristic?
+//    var currentChatCBCharacteristic : CBCharacteristic?
+//    var currentExchangeDataCBCharacteristic : CBCharacteristic?
     
     var nearbyPeripherals  : [CBPeripheral]?
-    var nearbyCBServices : [CBService]?
-    
-    var currentCBPeripheral : CBPeripheral? //current friend in chat
+//    
+//    var currentCBPeripheral : CBPeripheral? //current friend in chat
 
     class func SharedInstance() -> BLECentralManager {
         struct Static {
@@ -52,7 +51,12 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
         } else {
             self.bluetoothManager?.stopScan()
-            self.bluetoothManager?.cancelPeripheralConnection(currentCBPeripheral)
+            
+            //TODO: logout current session
+            
+            
+            //then, cancel currentCBPeripheral
+            self.bluetoothManager?.cancelPeripheralConnection(ChatSession.SharedInstance().currentPeripheral)
             
             self.bluetoothManager = nil
         }
@@ -115,8 +119,6 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         NSLog("Discovered: \(peripheral)")
         
         let data = advertisementData[CBAdvertisementDataManufacturerDataKey] as? NSData
-        currentCBPeripheral = peripheral
-        
         let isConnectable:Bool = advertisementData["kCBAdvDataIsConnectable"] as! Bool
         
         //        currentCBPeripheral?.discoverServices([TRANSFER_SERVICE_UUID])
@@ -148,10 +150,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func centralManager(central: CBCentralManager!, didConnectPeripheral peripheral: CBPeripheral!) {
         NSLog("Perif: \(peripheral.identifier.UUIDString)")
-        
-        currentCBPeripheral = peripheral
-        currentCBPeripheral?.delegate = self
-        currentCBPeripheral?.discoverServices([SERVICE_TRANSFER_CBUUID])
+
+        peripheral.delegate = self
+        peripheral.discoverServices([SERVICE_TRANSFER_CBUUID])
     }
     
     func centralManager(central: CBCentralManager!, willRestoreState dict: [NSObject : AnyObject]!) {
@@ -167,7 +168,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services {
             if let _service = service as? CBService {
                 NSLog("service : \(_service.description)")
-                currentCBPeripheral?.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID], forService: _service)
+                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID], forService: _service)
                 //TODO: move EXChange service to ChatRoom
             }
         }
@@ -187,12 +188,12 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             //detect if writable if want to write
             if (cb.UUID == USER_ID_CBUUID) {
                 //request read value
-                currentChatCBCharacteristic = cb;
-                currentCBPeripheral?.readValueForCharacteristic(cb)
-                currentCBPeripheral?.setNotifyValue(true, forCharacteristic: cb);
+//                currentChatCBCharacteristic = cb;
+                peripheral.readValueForCharacteristic(cb)
+                peripheral.setNotifyValue(true, forCharacteristic: cb);
             } else if (cb.UUID == EXCHANGE_DATA_CBUUID) {
-                currentExchangeDataCBCharacteristic = cb;
-                currentCBPeripheral?.setNotifyValue(true, forCharacteristic: cb)
+//                currentExchangeDataCBCharacteristic = cb;
+                peripheral.setNotifyValue(true, forCharacteristic: cb)
             }
         }
     }

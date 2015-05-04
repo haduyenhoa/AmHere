@@ -48,8 +48,8 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
         self.demoData?.messages.addObject(msg)
         
         //send to Peripheral
-        if let _cb = BLECentralManager.SharedInstance().currentExchangeDataCBCharacteristic
-        , let _peripheral = BLECentralManager.SharedInstance().currentCBPeripheral
+        if let _cb = ChatSession.SharedInstance().currentPeripheral?.getTransferService()?.getExchangCharacteristic()
+        , let _peripheral = ChatSession.SharedInstance().currentPeripheral
         {
             if (_peripheral.services == nil) { //or another technic
                 //alert disconnected

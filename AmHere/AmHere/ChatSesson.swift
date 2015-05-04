@@ -7,12 +7,15 @@
 //
 
 import Foundation
-
+import CoreBluetooth
 class ChatSession : NSObject {
     var userId : String?
     var sessionStarted : Bool = false
     var friendId : String?
     var isHost : Bool = false
+    
+    var currentPeripheral : CBPeripheral?
+    var currentExchangeCharacteristic : CBCharacteristic?
     
     class func SharedInstance() -> ChatSession {
         struct Static {
@@ -27,9 +30,12 @@ class ChatSession : NSObject {
         return Static.instance!
     }
     
-    func beginChat(isHost : Bool, friendUserId : String) {
+    func beginChat(isHost : Bool, friendUserId : String, perif : CBPeripheral, exchangeCharacteristic : CBCharacteristic) {
         self.friendId = friendUserId
         sessionStarted = true
+        
+        self.currentPeripheral = perif
+        self.currentExchangeCharacteristic = exchangeCharacteristic
         
         NSUserDefaults.saveIncomingAvatarSetting(true)
         NSUserDefaults.saveOutgoingAvatarSetting(true)

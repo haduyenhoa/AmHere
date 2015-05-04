@@ -128,17 +128,39 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier?.compare("startChatRoom", options: .allZeros, range: nil, locale: nil) == .OrderedSame) {
             if let _indexPath = self.tblFriends.indexPathForSelectedRow()
-                , let perif = BLECentralManager.SharedInstance().nearbyPeripherals?[_indexPath.row] {
+                , let _perif = BLECentralManager.SharedInstance().nearbyPeripherals?[_indexPath.row]
+            {
+                if let _transferService = _perif.getTransferService() {
+                    var exC = _transferService.getExchangCharacteristic()
                     
-                    if let _transferService = perif.getTransferService() {
-                        if let _userIdChar = _transferService.getUserIdCharacteristic() {
-                           ChatSession.SharedInstance().friendId = NSString(data: _userIdChar.value, encoding: NSUTF8StringEncoding) as? String
-                            
-                            
-                        } else {
-                            
+                    var userIdC = _transferService.getUserIdCharacteristic()
+                    
+                    if let _exC = exC, let _userIdC = userIdC {
+                        var userId = NSString(data: _userIdC.value, encoding: NSUTF8StringEncoding) as? String
+                        
+                        if userId == nil {
+                            userId = ""
                         }
+                        
+                        ChatSession.SharedInstance().beginChat(true, friendUserId: userId!, perif: _perif, exchangeCharacteristic: _exC)
+                    } else {
+                        println("Cannot find exchange characteristic or userId characteristic")
                     }
+                } else {
+                    println("Cannot find transfer service")
+                }
+               
+                
+                
+             /*
+            , let _exchangeCharacteristic = perif.getTransferService()?.getExchangCharacteristic()
+            , let _transferService = perif.getTransferService()
+            , let _userIdChar = _transferService.getUserIdCharacteristic() {
+*/
+                
+                
+                
+
             }
         }
     }

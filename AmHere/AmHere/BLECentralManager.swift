@@ -129,8 +129,8 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func enableLE(shouldEnable : Bool) {
         if (shouldEnable) {
-//            var _options = [NSObject : AnyObject]()
-//            _options.updateValue("identifier", forKey: CBCentralManagerOptionRestoreIdentifierKey)
+            var _options = [NSObject : AnyObject]()
+            _options.updateValue("identifier", forKey: CBCentralManagerOptionRestoreIdentifierKey)
             self.bluetoothManager = CBCentralManager(delegate: self, queue: nil, options:nil)
             
         } else {
@@ -198,23 +198,13 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func centralManager(central: CBCentralManager!, didDiscoverPeripheral peripheral: CBPeripheral!, advertisementData: [NSObject : AnyObject]!, RSSI: NSNumber!) {
         
-        var parameter = NSInteger(45)
-        let dataP = NSData(bytes: &parameter, length: 1)
-        
-        NSLog("Discovered: \(peripheral)")
-        
-        let data = advertisementData[CBAdvertisementDataManufacturerDataKey] as? NSData
+        println("\(__FUNCTION__): Discovered: \(peripheral)")
+
         let isConnectable:Bool = advertisementData[CBAdvertisementDataIsConnectable] as! Bool
-        let vendorId = advertisementData[CBAdvertisementDataLocalNameKey] as? String
-        //        currentCBPeripheral?.discoverServices([TRANSFER_SERVICE_UUID])
         
-//        assert(vendorId != nil, "Vendor ID cannot be nil")
+        let generatedDeviceUUIDIdentifier = advertisementData[CBAdvertisementDataLocalNameKey] as? String
         
-        //        currentCBPeripheral?.writeValue(dataP, forCharacteristic: CBCharacteristic(), type: CBCharacteristicWriteType.WithResponse)
-        
-//        if (nearbyPeripherals == nil) {
-//            nearbyPeripherals = [CBPeripheral]()
-//        }
+        println("Generated Device UUID: \(generatedDeviceUUIDIdentifier)")
         
         let exitArrays = dicPeripheral.values.array.filter() {
             return ($0.0 as CBPeripheral).identifier == peripheral.identifier
@@ -223,26 +213,18 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         if exitArrays.count > 0 {
             println("This perif is already added \(peripheral.identifier.UUIDString)")
         } else {
-            if let _vendor = vendorId {
+            if let _deviceUUID = generatedDeviceUUIDIdentifier {
                 peripheral.delegate = self
                 
-                println("Add/update for vendor : \(_vendor)")
-                dicPeripheral.updateValue((peripheral, advertisementData), forKey: _vendor)
+                println("Add/update for vendor : \(_deviceUUID)")
+                dicPeripheral.updateValue((peripheral, advertisementData), forKey: _deviceUUID)
                 
                 //discovery service
                 self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
+            } else {
+                
             }
         }
-        
-        
-        
-        
-        
-        /*
-        
-        */
-        
-        
     }
     
     func centralManager(central: CBCentralManager!, didConnectPeripheral peripheral: CBPeripheral!) {
@@ -264,7 +246,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didDiscoverServices error: NSError!) {
         for service in peripheral.services {
             if let _service = service as? CBService {
-                NSLog("service : \(_service.description)")
+                NSLog("service : \(_service.UUID.getName())")
                 peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID], forService: _service)
                 //TODO: move EXChange service to ChatRoom
             }
@@ -283,7 +265,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
 //        NSLog("service : \(service.description)")
         
         for cb : CBCharacteristic in service.characteristics as! [CBCharacteristic] {
-            NSLog("character : \(cb)")
+            NSLog("character : \(cb.UUID.getName())")
             
             //detect if writable if want to write
             if (cb.UUID == USER_ID_CBUUID) {
@@ -310,7 +292,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     }
     
     func peripheral(peripheral: CBPeripheral!, didWriteValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
-        NSLog("didWriteValueForCharacteristic : \(characteristic.UUID.UUIDString)")
+        NSLog("didWriteValueForCharacteristic")
         
         if (error != nil) {
             NSLog("Error writing characteristic value: \(error.localizedDescription)")

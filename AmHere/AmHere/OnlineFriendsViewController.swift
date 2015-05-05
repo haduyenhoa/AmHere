@@ -66,7 +66,7 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                 (cell.viewWithTag(2) as! UILabel).text = "Fetching User Id ..."
             }
         } else {
-            (cell.viewWithTag(2) as! UILabel).text = "Fetching CB Service ..."
+            (cell.viewWithTag(2) as! UILabel).text = "Device is disconnected ..."
         }
         
         return cell

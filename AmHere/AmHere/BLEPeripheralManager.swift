@@ -41,6 +41,11 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     override init() {
         //create boardcast reagion &
         super.init()
+        
+        let a: CGFloat = 3.141592
+        let b: CGFloat = 3.141593
+        
+        let c : Bool  = a.distanceTo(b) < 0.0001
     }
     //MARK Peripheral Manager
     func peripheralManagerDidUpdateState(peripheral: CBPeripheralManager!) {
@@ -89,23 +94,18 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     func peripheralManager(peripheral: CBPeripheralManager!, didReceiveWriteRequests requests: [AnyObject]!) {
         println("didReceiveWriteRequests")
         
-        //TODO: process multi request (from multi user). Create multi chat-room
-        if let _request = requests as? [CBATTRequest] where _request.count > 0, let aR = requests[0] as? CBATTRequest {
-            let msg = NSString(data: aR.value, encoding: NSUTF8StringEncoding) as! String
+        for _request in requests as! [CBATTRequest] {
+            let msg = NSString(data: _request.value, encoding: NSUTF8StringEncoding) as! String
             
-            println("Received: \(msg)")
+            if let _perif = _request.characteristic.service.peripheral {
+                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.UUIDString)>, perif <\(_perif.name)>")
+            } else {
+                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.UUIDString)>, of unknown perif")
+            }
             
             //responds to sender
-            self.myBTManager?.respondToRequest(aR, withResult: CBATTError.Success)
-            
-            self.delegate?.receiveMessage?(msg, cb: aR.characteristic) //call delegate if possible
-            
-//            var localNotification = UILocalNotification()
-//            localNotification.fireDate = NSDate()
-//            localNotification.alertBody = "Hey, you must go shopping, remember?"
-//            localNotification.alertAction = "View List"
-//            
-//            UIApplication.sharedApplication().scheduleLocalNotification(localNotification)
+            self.myBTManager?.respondToRequest(_request, withResult: CBATTError.Success)
+            self.delegate?.receiveMessage?(msg, cb: _request.characteristic) //call delegate if possible
         }
     }
     

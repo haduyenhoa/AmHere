@@ -43,6 +43,12 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
         super.viewWillAppear(animated)
     }
     
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        leaveChatRoom()
+    }
+    
     //MARK JSQMessageViewController
     override func didPressSendButton(button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: NSDate!) {
         let msg = JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text)
@@ -158,19 +164,56 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
     
     
     //MARK: BLEPeripheralManager Delegate
-    func receiveMessage(msg: String!) {
-        let msg = JSQMessage(senderId: ChatSession.SharedInstance().friendId ?? "[Unknown]", displayName: senderDisplayName, text: msg)
+    func receiveMessage(msg: String!, cb : CBCharacteristic) {
+        println("\(__FUNCTION__):  Received \(msg) on Characteristic: \(cb.UUID.getName())")
+        let jsqMessage = JSQMessage(senderId: ChatSession.SharedInstance().friendId ?? "[Unknown]", displayName: senderDisplayName, text: msg)
         
-        self.demoData?.messages.addObject(msg)
-        dispatch_async(dispatch_get_main_queue(), {
-            self.finishSendingMessageAnimated(true)
+        if (cb.UUID == EXCHANGE_DATA_CBUUID) {
+            self.demoData?.messages.addObject(jsqMessage)
+            dispatch_async(dispatch_get_main_queue(), {
+                self.finishSendingMessageAnimated(true)
+                }
+            )
+        } else if (cb.UUID == END_CHAT_SESSION_CBUUID) {
+            if msg.compare("bye", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil, locale: nil) == .OrderedSame {
+                println("Other leaves the room")
+                receiveLeftChatRoom()
+            } else {
+                //this message is not well formatted
             }
-        )
-        
+        } else if (cb.UUID  == RECONNECT_CBUUID) {
+            receiveReconnect()
+        } else {
+            //do nothing
+        }
     }
     
     //MARK Swipe gesture
     func handleSwipeLeft(recognizer : UIGestureRecognizer) {
         println("swipe left")
+    }
+    
+    //MARK: chat function
+    func leaveChatRoom() {
+        //send "Bye" to another
+        if let _cb = ChatSession.SharedInstance().currentPeripheral?.getTransferService()?.getEndChatSessionCharacteristic()
+            , let _peripheral = ChatSession.SharedInstance().currentPeripheral
+        {
+            if (_peripheral.services == nil) {
+                //(s)he left the room
+            } else {
+                _peripheral.writeValue("Bye".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), forCharacteristic: _cb, type: CBCharacteristicWriteType.WithResponse)
+            }
+        }
+    }
+    
+    func receiveLeftChatRoom() {
+        //disable Send button
+        println("\(__FUNCTION__)")
+    }
+    
+    func receiveReconnect() {
+        //disable Send button
+        println("\(__FUNCTION__)")
     }
 }

@@ -104,7 +104,14 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                         }
                     }
                 } else {
-                    println("Cannot find transfer service")
+                    println("Cannot find transfer service. Reconnect to that peripheral now")
+                    
+                    //ask to reconnect to the peripheral
+                    _perif.delegate = BLECentralManager.SharedInstance()
+                    
+                    //discovery service, 
+                    //TODO: hope that all services are available when the ChatRoomViewController is displayed, else we have to wait
+                    BLECentralManager.SharedInstance().bluetoothManager?.connectPeripheral(_perif, options: nil)
                 }
             }
         }

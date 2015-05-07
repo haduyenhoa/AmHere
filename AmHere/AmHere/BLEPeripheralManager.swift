@@ -11,14 +11,9 @@ import CoreBluetooth
 import UIKit
 
 
-public let SERVICE_TRANSFER_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440000")
-
-public let AVATAR_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440001")
-public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002")
-public let EXCHANGE_DATA_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440003") //use for delivery a chat message or an image
 
 @objc protocol PeripheralDelegate {
-    optional func receiveMessage(msg: String!)
+    optional func receiveMessage(msg: String!, cb : CBCharacteristic)
 }
 
 class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
@@ -55,13 +50,15 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             var transferService  = CBMutableService(type: SERVICE_TRANSFER_CBUUID, primary: true)
             
             //add characteristic
-            if let _userId = ChatSession.SharedInstance().userId{
+            if let _userId = ChatSession.SharedInstance().userId {
+                //Create CBCharacteristics
                 let userIdChar = CBMutableCharacteristic(type: USER_ID_CBUUID, properties: CBCharacteristicProperties.Read
                     , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
-                let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify
-                    , value: nil, permissions: CBAttributePermissions.Writeable)
+                let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                let endSessionChar = CBMutableCharacteristic(type: END_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                let reconnectChar = CBMutableCharacteristic(type: RECONNECT_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 
-                transferService.characteristics = [userIdChar, exchangeDataChar]
+                transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, reconnectChar]
                 
                 self.myBTManager?.addService(transferService)
                 self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID], CBAdvertisementDataLocalNameKey : (UIApplication.sharedApplication().delegate as! AppDelegate).UUIDString])
@@ -101,7 +98,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             //responds to sender
             self.myBTManager?.respondToRequest(aR, withResult: CBATTError.Success)
             
-            self.delegate?.receiveMessage?(msg) //call delegate if possible
+            self.delegate?.receiveMessage?(msg, cb: aR.characteristic) //call delegate if possible
             
 //            var localNotification = UILocalNotification()
 //            localNotification.fireDate = NSDate()

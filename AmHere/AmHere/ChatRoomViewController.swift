@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import CoreBluetooth
 
-class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
+class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate, BLECentralManagerDelegate {
     var demoData : DemoModelData?
     
     override func viewDidLoad() {
@@ -39,6 +39,8 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
         self.senderDisplayName = "Name: " + ChatSession.SharedInstance().userId!
         
         BLEPeripheralManager.SharedInstance().delegate = self
+        
+        BLECentralManager.SharedInstance().delegate = self
         
         super.viewWillAppear(animated)
     }
@@ -215,5 +217,23 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate {
     func receiveReconnect() {
         //disable Send button
         println("\(__FUNCTION__)")
+    }
+    
+    
+    //TODO: fix this cause this will cause error on multi threading (received chat response earlier than went to this view)
+    func receivedChatResponse(accepted: Bool) {
+        if (accepted) {
+            //continue to chat
+        } else {
+            //quit chat
+            let alertControl = UIAlertController(title: "Oups", message: "Your partner does not want to chat", preferredStyle: UIAlertControllerStyle.Alert)
+            let acceptAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default, handler: nil)
+            alertControl.addAction(acceptAction)
+            
+            self.presentViewController(alertControl, animated: true, completion: nil)
+            
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        
     }
 }

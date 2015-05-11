@@ -18,6 +18,7 @@ public let USER_ID_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440002
 public let EXCHANGE_DATA_CBUUID = CBUUID(string: "110e8400-e29b-11d4-a716-446655440003") //use for delivery a chat message or an image
 public let RECONNECT_CBUUID = CBUUID(string:"110e8400-e29b-11d4-a716-446655440004") //use for requesting re-connect a session
 public let END_CHAT_SESSION_CBUUID = CBUUID(string:"110e8400-e29b-11d4-a716-446655440005") //use for requesting end chat session
+public let START_CHAT_SESSION_CBUUID = CBUUID(string:"110e8400-e29b-11d4-a716-446655440006") //use for requesting end chat session
 
 extension CBUUID {
     func getName() -> String {
@@ -35,6 +36,8 @@ extension CBUUID {
             return "Exchange Characteristic"
         case END_CHAT_SESSION_CBUUID:
             return "End chat session Characteristic"
+        case START_CHAT_SESSION_CBUUID:
+            return "Begin chat session Characteristic"
         case RECONNECT_CBUUID:
             return "Reconnect Characteristic"
         default:
@@ -119,6 +122,17 @@ extension CBService {
         if let _chars = self.characteristics {
             let result = _chars.filter() {
                 return ($0 as! CBCharacteristic).UUID == END_CHAT_SESSION_CBUUID
+            }
+            return result.first as? CBCharacteristic
+        }
+        
+        return nil
+    }
+    
+    func getStartChatSessionCharacteristic() -> CBCharacteristic? {
+        if let _chars = self.characteristics {
+            let result = _chars.filter() {
+                return ($0 as! CBCharacteristic).UUID == START_CHAT_SESSION_CBUUID
             }
             return result.first as? CBCharacteristic
         }

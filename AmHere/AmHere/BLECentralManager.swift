@@ -138,18 +138,20 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
             //disconnect then reconnect?
         } else {
-            if let _deviceUUID = generatedDeviceUUIDIdentifier {
-                peripheral.delegate = self
-                
-
-                println("Add/update for vendor : \(_deviceUUID)")
-                dicPeripheral.updateValue((peripheral, advertisementData), forKey: _deviceUUID)
-                
-                //discovery service
-                self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
-            } else {
-                
-            }
+            //move to the below
+        }
+        
+        if let _deviceUUID = generatedDeviceUUIDIdentifier {
+            peripheral.delegate = self
+            
+            
+            println("Add/update for vendor : \(_deviceUUID)")
+            dicPeripheral.updateValue((peripheral, advertisementData), forKey: _deviceUUID)
+            
+            //discovery service
+            self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
+        } else {
+            
         }
     }
     

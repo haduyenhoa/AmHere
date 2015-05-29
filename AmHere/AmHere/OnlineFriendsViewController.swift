@@ -130,21 +130,29 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     func receiveMessage(msg: String!, cb: CBCharacteristic, request: CBATTRequest) {
         //display an an alert
         if !ChatSession.SharedInstance().sessionStarted {
-            let alertControl = UIAlertController(title: "Hello", message: "Do you want to chat? From \(msg)", preferredStyle: UIAlertControllerStyle.Alert)
-            let acceptAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
-                //join now
-                BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.Success)
-            })
+            dispatch_async(dispatch_get_main_queue(), {
+                
+                let alertControl = UIAlertController(title: "Hello", message: "Do you want to chat? From " + msg, preferredStyle: UIAlertControllerStyle.Alert)
+                let acceptAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+                    //join now
+                    BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.Success)
+                    
+                    //TODO: open chat now
+                    self.performSegueWithIdentifier("startChatRoom", sender: nil);
+                })
+                
+                let refuseAction = UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+                    //refuse
+                    BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.WriteNotPermitted)
+                })
+                
+                alertControl.addAction(refuseAction)
+                alertControl.addAction(acceptAction)
+                
+                
+                self.presentViewController(alertControl, animated: true, completion: nil)
+                })
             
-            let refuseAction = UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
-                //refuse
-                BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.WriteNotPermitted)
-            })
-            
-            alertControl.addAction(refuseAction)
-            alertControl.addAction(acceptAction)
-            
-            self.presentViewController(alertControl, animated: true, completion: nil)
         } else {
             println("Another chat session is started. Is it necessary to request?")
         }

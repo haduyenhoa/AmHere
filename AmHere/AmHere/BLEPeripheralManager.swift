@@ -14,6 +14,8 @@ import UIKit
 
 @objc protocol PeripheralDelegate {
     optional func receiveMessage(msg: String!, cb : CBCharacteristic)
+    optional func receiveMessage(msg: String!, cb : CBCharacteristic, request : CBATTRequest)
+    
 }
 
 class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
@@ -47,6 +49,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         
         let c : Bool  = a.distanceTo(b) < 0.0001
     }
+    
     //MARK Peripheral Manager
     func peripheralManagerDidUpdateState(peripheral: CBPeripheralManager!) {
         println(__FUNCTION__)
@@ -61,7 +64,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
                     , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
                 let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 let endSessionChar = CBMutableCharacteristic(type: END_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
-                let beginSessionChar = CBMutableCharacteristic(type: BEGIN_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                 let beginSessionChar = CBMutableCharacteristic(type: START_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 let reconnectChar = CBMutableCharacteristic(type: RECONNECT_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 
                 transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, beginSessionChar, reconnectChar]
@@ -98,6 +101,8 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         for _request in requests as! [CBATTRequest] {
             let msg = NSString(data: _request.value, encoding: NSUTF8StringEncoding) as! String
             
+            /*
+
             if let _perif = _request.characteristic.service.peripheral {
                 println("received request <\(msg)> from cb <\(_request.characteristic.UUID.getName())>, perif <\(_perif.name)>")
                 
@@ -114,10 +119,17 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             } else {
                 println("received request <\(msg)> from cb <\(_request.characteristic.UUID.getName())>, of unknown perif")
             }
+*/
+  
+//            println("received request <\(msg)> from cb <\(_request.characteristic.UUID.UUIDString)>, of unknown perif")
             
             //responds to sender
-            self.myBTManager?.respondToRequest(_request, withResult: CBATTError.Success)
-            self.delegate?.receiveMessage?(msg, cb: _request.characteristic) //call delegate if possible
+            if (_request.characteristic.UUID == START_CHAT_SESSION_CBUUID) {
+                self.delegate?.receiveMessage?(msg, cb: _request.characteristic, request: _request) //call delegate if possible
+            } else if (_request.characteristic.UUID == EXCHANGE_DATA_CBUUID) {
+                self.myBTManager?.respondToRequest(_request, withResult: CBATTError.Success)
+                self.delegate?.receiveMessage?(msg, cb: _request.characteristic) //call delegate if possible
+            }
         }
     }
     

@@ -11,7 +11,7 @@ import UIKit
 import CoreBluetooth
 
 
-class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, BLECentralManagerDelegate {
+class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITableViewDataSource, BLECentralManagerDelegate, PeripheralDelegate {
     @IBOutlet weak var tblFriends : UITableView!
  
     override func viewWillAppear(animated: Bool) {
@@ -21,6 +21,11 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
         //Enable Receive
         BLECentralManager.SharedInstance().delegate = self
         BLECentralManager.SharedInstance().enableLE(true)
+        
+        
+        //Enable Broadcast's delegate
+        BLEPeripheralManager.SharedInstance().delegate = self
+        
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -72,6 +77,7 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
         return cell
     }
     
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier?.compare("startChatRoom", options: .allZeros, range: nil, locale: nil) == .OrderedSame) {
             if let _indexPath = self.tblFriends.indexPathForSelectedRow()
@@ -82,14 +88,17 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                     var exC = _transferService.getExchangCharacteristic()
                     var requestChatC = _transferService.getEndChatSessionCharacteristic()
                     var userIdC = _transferService.getUserIdCharacteristic()
+                    var beginChatC = _transferService.getStartChatSessionCharacteristic()
                     
-                    if let _exC = exC, let _userIdC = userIdC {
+                    if let _exC = exC, let _userIdC = userIdC, let _beginChatC = beginChatC {
                         var userId = NSString(data: _userIdC.value, encoding: NSUTF8StringEncoding) as? String
                         
                         if userId == nil {
                             userId = ""
                         }
                         
+                        _perif.writeValue("START".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), forCharacteristic: _beginChatC, type: CBCharacteristicWriteType.WithResponse)
+
                         ChatSession.SharedInstance().beginChat(true, friendUserId: userId!, perif: _perif, exchangeCharacteristic: _exC)
                     } else {
                         if let _userIdC = userIdC {
@@ -115,5 +124,38 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                 }
             }
         }
+    }
+    
+    //receive request to start chat-room
+    func receiveMessage(msg: String!, cb: CBCharacteristic, request: CBATTRequest) {
+        //display an an alert
+        if !ChatSession.SharedInstance().sessionStarted {
+            dispatch_async(dispatch_get_main_queue(), {
+                
+                let alertControl = UIAlertController(title: "Hello", message: "Do you want to chat? From " + msg, preferredStyle: UIAlertControllerStyle.Alert)
+                let acceptAction = UIAlertAction(title: "Yes", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+                    //join now
+                    BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.Success)
+                    
+                    //TODO: open chat now
+                    self.performSegueWithIdentifier("startChatRoom", sender: nil);
+                })
+                
+                let refuseAction = UIAlertAction(title: "No", style: UIAlertActionStyle.Default, handler: {(action) -> Void in
+                    //refuse
+                    BLEPeripheralManager.SharedInstance().myBTManager?.respondToRequest(request, withResult: CBATTError.WriteNotPermitted)
+                })
+                
+                alertControl.addAction(refuseAction)
+                alertControl.addAction(acceptAction)
+                
+                
+                self.presentViewController(alertControl, animated: true, completion: nil)
+                })
+            
+        } else {
+            println("Another chat session is started. Is it necessary to request?")
+        }
+            
     }
 }

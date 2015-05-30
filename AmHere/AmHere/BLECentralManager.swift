@@ -13,6 +13,8 @@ import CoreBluetooth
     optional func peripheralsUpdated()
     
     optional func servicesUpdated(peripheral : CBPeripheral!)
+    
+    optional func receivedChatResponse(accepted : Bool)
 }
 
 /**
@@ -136,18 +138,20 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             
             //disconnect then reconnect?
         } else {
-            if let _deviceUUID = generatedDeviceUUIDIdentifier {
-                peripheral.delegate = self
-                
-
-                println("Add/update for vendor : \(_deviceUUID)")
-                dicPeripheral.updateValue((peripheral, advertisementData), forKey: _deviceUUID)
-                
-                //discovery service
-                self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
-            } else {
-                
-            }
+            //move to the below
+        }
+        
+        if let _deviceUUID = generatedDeviceUUIDIdentifier {
+            peripheral.delegate = self
+            
+            
+            println("Add/update for vendor : \(_deviceUUID)")
+            dicPeripheral.updateValue((peripheral, advertisementData), forKey: _deviceUUID)
+            
+            //discovery service
+            self.bluetoothManager?.connectPeripheral(peripheral, options: nil)
+        } else {
+            
         }
     }
     
@@ -171,7 +175,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services {
             if let _service = service as? CBService {
                 NSLog("service : \(_service.UUID.getName())")
-                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID, END_CHAT_SESSION_CBUUID, RECONNECT_CBUUID,BEGIN_CHAT_SESSION_CBUUID], forService: _service)
+                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID, END_CHAT_SESSION_CBUUID,START_CHAT_SESSION_CBUUID, RECONNECT_CBUUID, START_CHAT_SESSION_CBUUID], forService: _service)
                 //TODO: move EXChange service to ChatRoom
             }
         }
@@ -226,6 +230,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         
         if (error != nil) {
             NSLog("Error writing characteristic value: \(error.localizedDescription)")
+            if (characteristic.UUID == START_CHAT_SESSION_CBUUID) {
+                self.delegate?.receivedChatResponse?(false)
+            }
         }
     }
     

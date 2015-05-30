@@ -171,7 +171,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         for service in peripheral.services {
             if let _service = service as? CBService {
                 NSLog("service : \(_service.UUID.getName())")
-                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID, END_CHAT_SESSION_CBUUID, RECONNECT_CBUUID], forService: _service)
+                peripheral.discoverCharacteristics([USER_ID_CBUUID, EXCHANGE_DATA_CBUUID, AVATAR_CBUUID, END_CHAT_SESSION_CBUUID, RECONNECT_CBUUID,BEGIN_CHAT_SESSION_CBUUID], forService: _service)
                 //TODO: move EXChange service to ChatRoom
             }
         }
@@ -218,6 +218,12 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didWriteValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
         println("\(__FUNCTION__): didWriteValueForCharacteristic")
         
+        if characteristic.UUID == BEGIN_CHAT_SESSION_CBUUID
+            && error == nil {
+                //can begin chat session now
+                println("Can begin chat room now")
+        }
+        
         if (error != nil) {
             NSLog("Error writing characteristic value: \(error.localizedDescription)")
         }
@@ -228,8 +234,6 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         if let _data = characteristic.value {
             //update peripherals cause we can see name
             self.delegate?.peripheralsUpdated!()
-            
-//            println("Got value: \(NSString(data: _data, encoding: NSUTF8StringEncoding) as? String)) from characteristic \(characteristic.UUID.UUIDString)")
         }
     }
     

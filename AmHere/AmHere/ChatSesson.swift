@@ -8,6 +8,11 @@
 
 import Foundation
 import CoreBluetooth
+
+enum ChatSessionState {
+    
+}
+
 class ChatSession : NSObject {
     var userId : String?
     var sessionStarted : Bool = false
@@ -42,6 +47,18 @@ class ChatSession : NSObject {
         NSUserDefaults.saveOutgoingAvatarSetting(true)
         
         BLECentralManager.SharedInstance().bluetoothManager?.stopScan()
+        
+        //ask to chat, send request
+        
+        //send to Peripheral
+        if let _cb = self.currentPeripheral?.getTransferService()?.getBeginChatSessionCharacteristic()
+        {
+            self.currentPeripheral!.writeValue("***BEGIN_CHAT***".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), forCharacteristic: _cb, type: CBCharacteristicWriteType.WithResponse)
+        } else {
+            //TODO: refresh peripherif to get begin chat session
+            println("Have to discover begin chat Characteristic again")
+            self.currentPeripheral?.discoverCharacteristics([BEGIN_CHAT_SESSION_CBUUID, EXCHANGE_DATA_CBUUID], forService: self.currentPeripheral?.getTransferService())
+        }
     }
     
     func stopChat() {

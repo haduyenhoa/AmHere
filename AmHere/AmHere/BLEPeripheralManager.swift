@@ -61,9 +61,10 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
                     , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
                 let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 let endSessionChar = CBMutableCharacteristic(type: END_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                let beginSessionChar = CBMutableCharacteristic(type: BEGIN_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 let reconnectChar = CBMutableCharacteristic(type: RECONNECT_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
                 
-                transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, reconnectChar]
+                transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, beginSessionChar, reconnectChar]
                 
                 self.myBTManager?.addService(transferService)
                 self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID], CBAdvertisementDataLocalNameKey : (UIApplication.sharedApplication().delegate as! AppDelegate).UUIDString])
@@ -98,9 +99,20 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
             let msg = NSString(data: _request.value, encoding: NSUTF8StringEncoding) as! String
             
             if let _perif = _request.characteristic.service.peripheral {
-                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.UUIDString)>, perif <\(_perif.name)>")
+                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.getName())>, perif <\(_perif.name)>")
+                
+                if _request.characteristic.UUID == BEGIN_CHAT_SESSION_CBUUID {
+                    println("Some one ask to begin chat session")
+                } else if _request.characteristic.UUID == END_CHAT_SESSION_CBUUID {
+                    println("Some one ask to end chat session")
+                } else if (_request.characteristic.UUID == EXCHANGE_DATA_CBUUID) {
+                    println("Some one ask to send msg during chat session")
+                } else  if _request.characteristic.UUID == RECONNECT_CBUUID {
+                    println("Some one ask to reconnect corrupted session")
+                }
+                
             } else {
-                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.UUIDString)>, of unknown perif")
+                println("received request <\(msg)> from cb <\(_request.characteristic.UUID.getName())>, of unknown perif")
             }
             
             //responds to sender

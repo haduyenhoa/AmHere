@@ -80,7 +80,7 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
                 
                 if let _transferService = _perif.getTransferService() {
                     var exC = _transferService.getExchangCharacteristic()
-                    
+                    var requestChatC = _transferService.getEndChatSessionCharacteristic()
                     var userIdC = _transferService.getUserIdCharacteristic()
                     
                     if let _exC = exC, let _userIdC = userIdC {

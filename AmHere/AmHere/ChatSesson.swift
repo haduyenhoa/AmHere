@@ -32,7 +32,7 @@ class ChatSession : NSObject {
         dispatch_once(&Static.onceToken, {
             Static.instance = ChatSession()
         })
-        
+
         return Static.instance!
     }
     
@@ -51,14 +51,16 @@ class ChatSession : NSObject {
         //ask to chat, send request
         
         //send to Peripheral
-        if let _cb = self.currentPeripheral?.getTransferService()?.getBeginChatSessionCharacteristic()
+        if let _cb = self.currentPeripheral?.getTransferService()?.getStartChatSessionCharacteristic()
         {
             self.currentPeripheral!.writeValue("***BEGIN_CHAT***".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), forCharacteristic: _cb, type: CBCharacteristicWriteType.WithResponse)
         } else {
             //TODO: refresh peripherif to get begin chat session
             println("Have to discover begin chat Characteristic again")
-            self.currentPeripheral?.discoverCharacteristics([BEGIN_CHAT_SESSION_CBUUID, EXCHANGE_DATA_CBUUID], forService: self.currentPeripheral?.getTransferService())
+            self.currentPeripheral?.discoverCharacteristics([START_CHAT_SESSION_CBUUID, EXCHANGE_DATA_CBUUID], forService: self.currentPeripheral?.getTransferService())
         }
+        
+        //TODO: do we need to stop advertising when we enter a chat (to avoid battery consume)
     }
     
     func stopChat() {

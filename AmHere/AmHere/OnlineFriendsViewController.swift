@@ -35,9 +35,6 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        //Enable broadcast
-        BLEPeripheralManager.SharedInstance().enableBroadcast(true)
     }
     
     //MARK: BLECentralManagerDelegate
@@ -69,6 +66,11 @@ class OnlineFriendsViewController : UIViewController, UITableViewDelegate, UITab
             } else {
                 //display "fetching user id"
                 (cell.viewWithTag(2) as! UILabel).text = "Fetching User Id ..."
+                
+                dispatch_async(dispatch_queue_create("com.haduyenhoa.service.updateUserId", nil), {
+                    BLECentralManager.SharedInstance().updateUserId(perif)
+                })
+                
             }
         } else {
             (cell.viewWithTag(2) as! UILabel).text = "Device is disconnected ..."

@@ -162,6 +162,14 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
         peripheral.discoverServices([SERVICE_TRANSFER_CBUUID])
     }
     
+    func centralManager(central: CBCentralManager!, didFailToConnectPeripheral peripheral: CBPeripheral!, error: NSError!) {
+        peripheral.delegate = nil
+        
+        //remove from dict?
+        println("\(__FUNCTION__):Perif: \(peripheral.identifier.UUIDString)")
+        
+    }
+    
     func centralManager(central: CBCentralManager!, willRestoreState dict: [NSObject : AnyObject]!) {
         println("\(__FUNCTION__):%@", dict)
     }
@@ -222,7 +230,7 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     func peripheral(peripheral: CBPeripheral!, didWriteValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
         println("\(__FUNCTION__): didWriteValueForCharacteristic")
         
-        if characteristic.UUID == BEGIN_CHAT_SESSION_CBUUID
+        if characteristic.UUID == START_CHAT_SESSION_CBUUID
             && error == nil {
                 //can begin chat session now
                 println("Can begin chat room now")
@@ -238,8 +246,9 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
     
     func peripheral(peripheral: CBPeripheral!, didUpdateValueForCharacteristic characteristic: CBCharacteristic!, error: NSError!) {
 //        NSLog("characteristic value : \(characteristic.value)")
-        if let _data = characteristic.value {
+        if characteristic.UUID == USER_ID_CBUUID {
             //update peripherals cause we can see name
+            NSLog("update peripherals cause we find user id characteristic")
             self.delegate?.peripheralsUpdated!()
         }
     }
@@ -250,6 +259,15 @@ class BLECentralManager : NSObject, CBCentralManagerDelegate, CBPeripheralDelega
             perif.discoverCharacteristics([AVATAR_CBUUID], forService: _cbService)
         } else {
             println("this perif does not have transfer service to get avatar characteristicf")
+        }
+        
+    }
+    
+    func updateUserId(perif : CBPeripheral) {
+        if let _cbService = perif.getTransferService() {
+            perif.discoverCharacteristics([USER_ID_CBUUID], forService: _cbService)
+        } else {
+            println("this perif does not have transfer service to get userId characteristicf")
         }
         
     }

@@ -185,7 +185,7 @@ class ChatRoomViewController: JSQMessagesViewController, PeripheralDelegate, BLE
             }
         } else if (cb.UUID  == RECONNECT_CBUUID) {
             receiveReconnect()
-        } else if (cb.UUID  == BEGIN_CHAT_SESSION_CBUUID) {
+        } else if (cb.UUID  == START_CHAT_SESSION_CBUUID) {
             //some other need to chat with me
             println("Other leaves the room")
             let alert = UIAlertController(title: "Request", message: "Do you want to chat with me?", preferredStyle: UIAlertControllerStyle.Alert)

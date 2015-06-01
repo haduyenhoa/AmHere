@@ -26,6 +26,8 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     var myBTManager : CBPeripheralManager? = nil
     var delegate : PeripheralDelegate?
     
+    var advertismentData : [NSObject : AnyObject]?
+    var needAdvertising = false
     
     class func SharedInstance() -> BLEPeripheralManager {
         struct Static {
@@ -44,10 +46,7 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         //create boardcast reagion &
         super.init()
         
-        let a: CGFloat = 3.141592
-        let b: CGFloat = 3.141593
-        
-        let c : Bool  = a.distanceTo(b) < 0.0001
+        advertismentData = [CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID], CBAdvertisementDataLocalNameKey : (UIApplication.sharedApplication().delegate as! AppDelegate).UUIDString]
     }
     
     //MARK Peripheral Manager
@@ -55,28 +54,34 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
         println(__FUNCTION__)
         if peripheral.state == CBPeripheralManagerState.PoweredOn {
             println("Broadcasting...")
-            var transferService  = CBMutableService(type: SERVICE_TRANSFER_CBUUID, primary: true)
-            
-            //add characteristic
-            if let _userId = ChatSession.SharedInstance().userId {
-                //Create CBCharacteristics
-                let userIdChar = CBMutableCharacteristic(type: USER_ID_CBUUID, properties: CBCharacteristicProperties.Read
-                    , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
-                let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
-                let endSessionChar = CBMutableCharacteristic(type: END_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
-                 let beginSessionChar = CBMutableCharacteristic(type: START_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
-                let reconnectChar = CBMutableCharacteristic(type: RECONNECT_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+            if (needAdvertising) {
+                var transferService  = CBMutableService(type: SERVICE_TRANSFER_CBUUID, primary: true)
                 
-                transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, beginSessionChar, reconnectChar]
-                
-                self.myBTManager?.addService(transferService)
-                self.myBTManager?.startAdvertising([CBAdvertisementDataServiceUUIDsKey:[SERVICE_TRANSFER_CBUUID], CBAdvertisementDataLocalNameKey : (UIApplication.sharedApplication().delegate as! AppDelegate).UUIDString])
-
+                //add characteristic
+                if let _userId = ChatSession.SharedInstance().userId {
+                    //Create CBCharacteristics
+                    let userIdChar = CBMutableCharacteristic(type: USER_ID_CBUUID, properties: CBCharacteristicProperties.Read
+                        , value: _userId.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true), permissions: CBAttributePermissions.Readable)
+                    let exchangeDataChar = CBMutableCharacteristic(type: EXCHANGE_DATA_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                    let endSessionChar = CBMutableCharacteristic(type: END_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                    let beginSessionChar = CBMutableCharacteristic(type: START_CHAT_SESSION_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                    let reconnectChar = CBMutableCharacteristic(type: RECONNECT_CBUUID, properties: CBCharacteristicProperties.Write | CBCharacteristicProperties.Notify, value: nil, permissions: CBAttributePermissions.Writeable)
+                    
+                    transferService.characteristics = [userIdChar, exchangeDataChar, endSessionChar, beginSessionChar, reconnectChar]
+                    
+                    self.myBTManager?.addService(transferService)
+                    self.myBTManager?.startAdvertising(advertismentData)
+                    
+                } else {
+                    //do nothing
+                    println("This session is not start, just do nothing")
+                    self.myBTManager?.stopAdvertising() //to be sure, stop advertising
+                }
             } else {
-                //do nothing
                 println("This session is not start, just do nothing")
                 self.myBTManager?.stopAdvertising() //to be sure, stop advertising
             }
+            
         } else if peripheral.state == CBPeripheralManagerState.PoweredOff {
             println("Stopped")
             self.myBTManager?.stopAdvertising()
@@ -136,10 +141,23 @@ class BLEPeripheralManager : NSObject, CBPeripheralManagerDelegate {
     //public function
     func enableBroadcast(shouldEnabled:Bool) {
         if (shouldEnabled) {
-            self.myBTManager = CBPeripheralManager(delegate: self, queue: nil, options: nil)
+            needAdvertising = true //in order to re-start service when in need
+            if self.myBTManager == nil {
+                NSLog("Create CBPeripheralManager to catch call-back peripheralManagerDidUpdateState then advetising");
+                self.myBTManager = CBPeripheralManager(delegate: self, queue: nil, options: nil)
+                
+            } else {
+                if (!self.myBTManager!.isAdvertising) {
+                    //update state
+                    self.peripheralManagerDidUpdateState(self.myBTManager)
+                } else {
+                    //do nothing
+                    NSLog("CBPeripheralManager has already advertised")
+                }
+            }
         } else {
             self.myBTManager?.stopAdvertising()
-            self.myBTManager = nil
+            needAdvertising = false
         }
         
     }

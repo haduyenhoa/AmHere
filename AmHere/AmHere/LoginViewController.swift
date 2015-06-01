@@ -25,7 +25,10 @@ class LoginViewController : UIViewController {
         if (self.tfUserId.text.isEmpty) {
             //do nothing
         } else {
+            //start advertising
             ChatSession.SharedInstance().userId = self.tfUserId.text
+            
+            BLEPeripheralManager.SharedInstance().enableBroadcast(true);
         }
     }
     

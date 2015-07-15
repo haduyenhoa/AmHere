@@ -17,6 +17,7 @@
 		FD7B936D1AF285460001DA2F /* ChatSesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936C1AF285460001DA2F /* ChatSesson.swift */; };
 		FD7B936F1AF2877B0001DA2F /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */; };
 		FD7B93711AF28A2F0001DA2F /* OnlineFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */; };
+		FDA38DF81B1DDABB002507AF /* images in Resources */ = {isa = PBXBuildFile; fileRef = FDA38DF71B1DDABB002507AF /* images */; };
 		FDE282AB1AF8E7EC00197DE1 /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDE282AA1AF8E7EC00197DE1 /* Helpers.swift */; };
 		FDFB6B5F1AF13272009538B9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDFB6B5E1AF13272009538B9 /* AppDelegate.swift */; };
 		FDFB6B611AF13272009538B9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDFB6B601AF13272009538B9 /* ViewController.swift */; };
@@ -55,6 +56,7 @@
 		FD7B936C1AF285460001DA2F /* ChatSesson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatSesson.swift; sourceTree = "<group>"; };
 		FD7B936E1AF2877B0001DA2F /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		FD7B93701AF28A2F0001DA2F /* OnlineFriendsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnlineFriendsViewController.swift; sourceTree = "<group>"; };
+		FDA38DF71B1DDABB002507AF /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = AmHere/images; sourceTree = "<group>"; };
 		FDE282AA1AF8E7EC00197DE1 /* Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		FDFB6B591AF13272009538B9 /* AmHere.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AmHere.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FDFB6B5D1AF13272009538B9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 		FDFB6B501AF13272009538B9 = {
 			isa = PBXGroup;
 			children = (
+				FDA38DF71B1DDABB002507AF /* images */,
 				ED8F77921AF6BB7F00B96E91 /* QuartzCore.framework */,
 				FDFB6B5B1AF13272009538B9 /* AmHere */,
 				FDFB6B711AF13272009538B9 /* AmHereTests */,
@@ -269,6 +272,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FDA38DF81B1DDABB002507AF /* images in Resources */,
 				FDFB6B641AF13272009538B9 /* Main.storyboard in Resources */,
 				FDFB6B691AF13272009538B9 /* LaunchScreen.xib in Resources */,
 				FDFB6B661AF13272009538B9 /* Images.xcassets in Resources */,
